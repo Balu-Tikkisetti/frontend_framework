@@ -5,7 +5,7 @@ import "../App.css";
 
 import axios from "axios";
 import { api } from "../model/constants";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 interface NavigationBarProps {
   onButtonClick: (componentName: string) => void;

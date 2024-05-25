@@ -90,7 +90,7 @@ function PostEdit() {
     
 
     try {
-      const response = await axios.post(`${api}/updatepost`, formData, {
+      await axios.post(`${api}/updatepost`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

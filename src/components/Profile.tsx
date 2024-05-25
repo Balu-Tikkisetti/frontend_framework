@@ -1,16 +1,15 @@
 import "../App.css";
 import "../profilepage.css";
 import "../components.css";
-import { useState, useEffect, useRef, RefObject, createRef } from "react";
+import { useState, useEffect} from "react";
 import axios from "axios";
 import { api } from "../model/constants";
 import { useParams, useNavigate } from "react-router-dom";
 import { Bytes } from "firebase/firestore";
-import { get } from "firebase/database";
+
 import CommentsSection from "./comments_section.tsx";
 import ShareOverlay from "./Share_overlay.tsx";
-import Search from "./Search";
-import ReactDOM from "react-dom";
+
 
 interface UserDetails {
   first_name: string;

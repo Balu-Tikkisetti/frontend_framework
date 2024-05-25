@@ -91,7 +91,7 @@ function ProfileEdit() {
           }
 
         try{
-            const response=await axios.post(`${api}/updateProfile`,formData,{
+            await axios.post(`${api}/updateProfile`,formData,{
                 headers: {
                   "Content-Type": "multipart/form-data",
                 },

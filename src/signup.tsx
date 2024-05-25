@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./App.css";
 import { api } from "./model/constants";
-import { ToastContainer, toast } from "react-toastify";
+
 import { useNavigate } from "react-router-dom";
 
 interface SignupProps {
@@ -47,6 +47,7 @@ function Signup({ onClose }: SignupProps) {
   const handleSubmit = () => {
     const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
     if (!strongRegex.test(formData.password)) {
+      console.log(passwordError);
       setPasswordError('Password must be 8 characters long, containing at least one uppercase letter, one lowercase letter, one number, and one special character.');
       return;
     }

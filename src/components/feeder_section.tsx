@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { api } from "../model/constants";
 import { useParams, useNavigate } from "react-router-dom";
-import Subscribed from "./Random";
+
 import CommentsSection from "./comments_section";
 import ShareOverlay from "./Share_overlay";
 

@@ -3,9 +3,9 @@ import "../profilepage.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { api } from "../model/constants.ts";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams} from "react-router-dom";
 import { Bytes } from "firebase/firestore";
-import { get } from "firebase/database";
+
 import CommentsSection from "./comments_section.tsx";
 
 interface UserDetails {
@@ -46,7 +46,7 @@ function SearchProfileView() {
 
   const [commentOpen, setCommentOpen] = useState<boolean[]>([]);
 
-  const [isDropdownOpen, setIsOpen] = useState(false);
+ 
 
   const { user_id, search_user_id } = useParams();
   const userId = search_user_id;

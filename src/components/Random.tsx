@@ -81,6 +81,7 @@ useEffect(()=>{
     }
   };
   if(user_id){
+    console.log(fetchLikesPosts);
     fetchRandomPosts();
   }
 

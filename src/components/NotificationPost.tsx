@@ -3,7 +3,7 @@ import { Bytes } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../model/constants";
-import { set } from "firebase/database";
+
 import CommentsSection from "./comments_section";
 import ShareOverlay from "./Share_overlay";
 

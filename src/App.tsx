@@ -8,9 +8,7 @@ function App() {
   const [showSignup, setShowSignup] = useState(false);
 
   const navigate = useNavigate();
-  const handleroute = () => {
-    navigate("/college_media");
-  };
+
 
   const handleSignupClick = () => {
     setShowSignup(true);

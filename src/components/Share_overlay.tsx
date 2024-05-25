@@ -1,9 +1,9 @@
 // ShareOverlay.tsx
 
-import React, { CSSProperties, RefObject, useState } from "react";
+import React, { CSSProperties,useState } from "react";
 import axios from "axios";
 import { api } from "../model/constants";
-import { useParams } from "wouter";
+
 import "../search.css";
 
 interface ShareOverlayProps {

@@ -1,6 +1,6 @@
 import "./App.css";
 import "./components.css";
-import React, { useState } from "react";
+import { useState } from "react";
 import Feeder from "./components/feeder_section.tsx";
 import Random from "./components/Random.tsx";
 import NavigationBar from "./components/navigator.tsx";

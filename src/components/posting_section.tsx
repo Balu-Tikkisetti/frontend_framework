@@ -1,8 +1,8 @@
-import React, { useRef, ChangeEvent, useState, useEffect } from "react";
+import  { useRef, ChangeEvent, useState,  } from "react";
 import axios from "axios";
 import "../App.css";
 import { api } from "../model/constants.ts";
-import { Bounce, toast, ToastContainer } from "react-toastify";
+
 
 function Postings() {
   const fileInputRef = useRef<HTMLInputElement>(null);
