@@ -1,0 +1,38 @@
+.profile-info-container {
+    display: flex;
+    align-items: center;
+
+  }
+
+  /* Show the hover button on hover */
+  .profile-info-container:hover .hover-button {
+    opacity: 1;
+  }
+  
+  .post-profile-icon {
+    width: 50px; /* Adjust as needed */
+    height: 50px; /* Adjust as needed */
+    border-radius: 50%;
+    margin-right: 10px; /* Adjust spacing between icon and name */
+  }
+  
+  .user-name {
+    margin: 0;
+  }
+
+  .p_media_holder{
+    width: auto;
+    height: auto;
+  }
+  
+  .p_image{
+    width: 400px;
+    height: 400px;
+  }
+  
+  
+  .post-profile-icon{
+    width: 50px;
+    height: 50px;
+  }
+  

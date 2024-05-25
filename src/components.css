@@ -1,0 +1,112 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+
+  
+
+  .posting-whole-area{
+    height: 600px;
+    width: 50%;
+  
+  }
+
+  .posting-div{
+    background-color: white;
+    height: 400px;
+  }
+
+  .description{
+    border-top: 0%;
+
+  }
+
+  .description-input{
+    height: auto;
+  }
+
+  
+
+  .image-selected{
+    height: 400px;
+    width: 800px;
+  }
+
+  .video-selected{
+    height: 375px;
+    width: 800px;
+  }
+
+
+  .comment-card{
+    width: 18em;
+    height: 50px;
+    margin-bottom: 20px;
+
+  }
+
+  .edit_area{
+    width: 600px;
+    height: 600px;
+  }
+
+  .edit_dp{
+    margin-bottom: 40px;
+  }
+
+  .edit_form{
+    margin-top: 150px;
+  }
+
+  .dropdown-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-content {
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 120px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    padding: 8px;
+    z-index: 1;
+    top: calc(100% + 5px); /* Position below the button */
+  }
+  
+  .dropdown-content button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 6px 12px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+  }
+  
+  .dropdown-content button:hover {
+    background-color: #ddd;
+  }
+
+  .post-edit-container{
+    width: auto;
+    height: auto;
+  }
+
+  .custom-file-upload {
+    cursor: pointer;
+  }
+  
+  .custom-file-upload input[type="file"] {
+    display: none;
+  }
+
+  .comment-space{
+    background-color: aliceblue;
+    maxHeight: "200px";
+    overflowY: "auto";
+  }
+  
+  .comment-details{
+    size: 10px;
+  }
+
+ 
+  

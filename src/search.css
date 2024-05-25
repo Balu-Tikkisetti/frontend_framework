@@ -1,0 +1,21 @@
+.search-bar{
+    width: 800px;
+    margin-top: 40px;
+}
+
+
+.show-area{
+    width: 800px;
+    height: auto;
+   
+    margin-top: 150px;
+
+}
+
+.user-details{
+    display: flex; /* Use flexbox */
+    align-items: center; /* Align items vertically */
+    gap: 30px;
+    margin-bottom: 20px;
+    width: 800px;
+}
