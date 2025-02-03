@@ -78,6 +78,23 @@ const Profile: React.FC = () => {
     }
   };
 
+  const handleDeleteTopic = (topicText: string, topicId: string) => {
+    if (window.confirm(`Are you sure you want to delete "${topicText}"?`)) {
+      deleteTopic(userId, topicId)
+        .then(() => {
+          // ✅ Update state to remove deleted topic from UI
+          setTopics((prevTopics) =>
+            prevTopics.filter((topic) => topic.id !== topicId)
+          );
+          alert("Topic deleted successfully!");
+        })
+        .catch((error) => {
+          console.error("Error deleting topic:", error);
+          alert("Failed to delete topic. Please try again.");
+        });
+    }
+  };
+
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
@@ -165,11 +182,22 @@ const Profile: React.FC = () => {
                   <h3>Topics</h3>
 
                   {topics.map((topic: Topic) => (
-                    <div
-                      key={topic.id}
-                      className="topic-card"
-                    >
-                      <p>@{topic.text}</p>
+                    <div key={topic.id} className="topic-card">
+                      <div className="topic-edit-delete">
+                        <span className="edit-btn">
+                          <i className="bi bi-pen"></i>
+                        </span>
+                        <span
+                          className="delete-btn"
+                          onClick={() =>
+                            handleDeleteTopic(topic.text, topic.id)
+                          }
+                        >
+                          <i className="bi bi-trash3"></i>
+                        </span>
+                      </div>
+
+                      <p>@ {topic.text}</p>
 
                       <div className="topic-actions ">
                         <div className="icon-container">
@@ -182,7 +210,6 @@ const Profile: React.FC = () => {
                           <i className="bi bi-star"></i>
                         </div>
                       </div>
-
                     </div>
                   ))}
                 </div>

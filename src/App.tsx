@@ -56,7 +56,7 @@ function App() {
           <Signup onClose={handleSignupClose} />
         ) : (
           <form onSubmit={handleLoginsubmit}>
-            <h2>College Media</h2>
+            <h2>T@pics</h2>
             <div className="form-floating mb-3">
               <input
                 type="text"

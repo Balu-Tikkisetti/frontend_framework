@@ -6,6 +6,9 @@ import { useAuth } from "../context/AuthContext";
 
 const API_BASE_URL = "http://localhost:8080/api"; // Change this for deployment
 
+
+
+
 export const fetchProfileData = async (userId: number): Promise<UserProfile> => {
   try {
     if (!userId) throw new Error("User ID is missing");
@@ -31,3 +34,6 @@ export const fetchProfileData = async (userId: number): Promise<UserProfile> => 
     throw error;
   }
 };
+
+
+

@@ -54,3 +54,22 @@ export const createNewTopic = async (userId: number,text: string, location: stri
     return null;
   }
 };
+
+
+export const deleteTopic = async (userId: number, topicId: string): Promise<void> => {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/topics/deletetopic`, {
+      params: { userId, topicId }, // ✅ Ensure correct parameters
+      withCredentials: true, // ✅ Send JWT if required
+    });
+
+    if (response.status === 200) {
+      console.log("Topic deleted successfully!");
+    } else {
+      throw new Error("Failed to delete topic.");
+    }
+  } catch (error) {
+    console.error("Error deleting topic:", error);
+    throw error;
+  }
+};

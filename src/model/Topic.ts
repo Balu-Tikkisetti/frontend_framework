@@ -1,5 +1,5 @@
 class Topic {
-  id: number;
+  id: String;
   userId: number | null; // ✅ Ensures consistency
   username: string; // ✅ Ensures consistency
   profilePicture: string | null; // ✅ Nullable profile picture
@@ -9,7 +9,7 @@ class Topic {
   topicImage: string | null; // ✅ Nullable image
 
   constructor(
-    id: number,
+    id: String,
     text: string,
     location: string,
     timestamp: string,

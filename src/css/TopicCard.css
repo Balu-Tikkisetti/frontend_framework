@@ -1,3 +1,26 @@
+.topics-list {
+    max-height: 60vh; /* Adjust based on layout */
+    overflow-y: auto; /* Enables vertical scrolling */
+    padding: 10px;
+}
+
+/* Optional: Add a scrollbar style */
+.topics-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.topics-list::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+.topics-list::-webkit-scrollbar-track {
+    background: #222;
+}
+
+
+
+
 /* Topic Card */
 .topic-card {
     background: linear-gradient(135deg, #2b2b2b, #1a1a1a); /* ✅ Unique black gradient */
@@ -15,6 +38,31 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
+}
+
+/* Edit & Delete Buttons */
+.topic-edit-delete {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.edit-btn, .delete-btn {
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: background 0.2s ease-in-out;
+}
+
+.edit-btn:hover {
+    background: rgba(0, 255, 0, 0.2);
+}
+
+.delete-btn:hover {
+    background: rgba(255, 0, 0, 0.2);
 }
 
 /* Profile Section */
