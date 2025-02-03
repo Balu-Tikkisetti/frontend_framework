@@ -1,0 +1,102 @@
+.navigation-bar{
+    display: flex;
+    justify-content: center; /* Horizontally center the content */
+    align-items: center; /* Vertically center the content */
+    width: 100%; /* Make the button occupy the full width of its parent */
+    height: 50px; /* Set the height as needed */
+    border: none;
+    color: #fff; /* White color for icon, adjust as needed */
+    font-size: 24px;
+    border-radius: 5px; /* Optional: Add border radius for rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    background-color: aliceblue;
+  }
+
+
+  .n{
+    display: flex;
+    justify-content: center; /* Horizontally center the content */
+    align-items: center; /* Vertically center the content */
+    width: 100%; /* Make the button occupy the full width of its parent */
+    height: 50px; /* Set the height as needed */
+    border: none;
+    font-size: 24px;
+    border-radius: 5px; /* Optional: Add border radius for rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+
+  .country-button:hover {
+    background-color: #f0f0f0; /* Change background color on hover */
+    color: #007bff; /* Change text/icon color on hover */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .country-button i:hover {
+    transform: scale(1.7); /* Slightly enlarge the icon */
+  }
+  
+
+  .community-button:hover {
+    background-color: #f0f0f0; /* Change background color on hover */
+    color: #007bff; /* Change text/icon color on hover */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .community-button i:hover {
+    transform: scale(1.7); /* Slightly enlarge the icon */
+  }
+
+  .global-button:hover {
+    background-color: #f0f0f0; /* Change background color on hover */
+    color: #007bff; /* Change text/icon color on hover */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .global-button i:hover {
+    transform: scale(1.7); /* Slightly enlarge the icon */
+  }
+
+
+  .trending-button:hover {
+    background-color: #f0f0f0; /* Change background color on hover */
+    color: #007bff; /* Change text/icon color on hover */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .trending-button i:hover {
+    transform: scale(1.7); /* Slightly enlarge the icon */
+  }
+
+
+  .country-button:hover {
+    background-color: #f0f0f0; /* Change background color on hover */
+    color: #007bff; /* Change text/icon color on hover */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .country-button i:hover {
+    transform: scale(1.7); /* Slightly enlarge the icon */
+  }
+
+  .notifications-button:hover {
+    background-color: #f0f0f0; /* Change background color on hover */
+    color: #007bff; /* Change text/icon color on hover */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .notifications-button i:hover {
+    transform: scale(1.7); /* Slightly enlarge the icon */
+  }
+
+  .profile-button:hover {
+    background-color: #f0f0f0; /* Change background color on hover */
+    color: #007bff; /* Change text/icon color on hover */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .profile-button i:hover {
+    transform: scale(1.7); /* Slightly enlarge the icon */
+  }

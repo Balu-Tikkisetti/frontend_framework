@@ -1,0 +1,213 @@
+/* Global Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Container */
+  .profile-page {
+    width: 200vh;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    background-color: #f0f0f2;
+  }
+
+  .row{
+    width: 110%;
+    height: 100%;
+  }
+  
+
+  
+
+  
+  .profile-section {
+    text-align: center;
+  }
+  
+  .profile-pic {
+    width: 200px;
+    height: 200px;
+   
+    object-fit: cover;
+  }
+  
+  .username {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+  
+  
+
+  .sidebar{
+   
+  }
+
+  
+  .sidebar-item {
+    padding: 0.8rem 1.2rem;
+    background: #f0f0f2; /* Optional background */
+    border-radius: 8px;
+    text-align: center;
+    flex: 1; /* Equal width items */
+    width: 300px;
+    max-width: 250px; /* Prevent over-expanding */
+    transition: transform 0.2s ease;
+    line-height: 100px;
+  }
+  
+  .sidebar-item:hover {
+    transform: translateY(-2px);
+    background: #eee;
+  }
+  
+  /* Main Content */
+  .content {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    width: max-content;
+   
+  }
+
+  .content-container{
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Toggle Buttons */
+  .profile-toggle-buttons {
+    display: flex;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .profile-toggle-buttons button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+    transition: background 0.2s ease-in-out;
+  }
+  
+  .profile-toggle-buttons .btn-secondary {
+    background: #9dbfe4;
+    color: white;
+  }
+  
+  .profile-toggle-buttons .btn-outline-secondary {
+    background: white;
+    color: black;
+    border: 1px solid #eceef1;
+  }
+  
+  .profile-toggle-buttons .btn-outline-secondary:hover {
+    background: #bfd4eb;
+    color: white;
+  }
+  
+  /* Topics Section */
+  .profile-topics-section {
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .topics-list h3 {
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+  
+  .topic-item {
+    padding: 1rem;
+    background: #f9f9f9;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .topic-item h4 {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .topic-item p {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  /* Create Topic Section */
+  .topic-create textarea {
+    width: 100%;
+    height: 80px;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: none;
+  }
+  
+  .topic-create input[type="file"] {
+    margin-top: 10px;
+  }
+  
+  .topic-create button {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .topic-create button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Photo Preview Section */
+  .photo-preview img {
+    display: block;
+    max-width: 100%;
+    max-height: 200px;
+    height: auto;
+    margin: 10px auto;
+    border-radius: 8px;
+  }
+  
+  /* Scrollable Section */
+  .scrollable-view {
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+  }
+
+
+ 
+  
+  
+
+  /* Responsive */
+
+  @media screen and (max-width: 800px) {
+    .profile-page{
+        width: 65vh;
+    }
+
+    .sidebar-links {
+        display: flex;
+        gap: 50px; /* Space between items */
+        align-items: center; /* Vertical alignment */
+      }
+    .profile-pic{
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }

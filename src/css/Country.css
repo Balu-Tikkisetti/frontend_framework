@@ -1,0 +1,39 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+
+  .country-page{
+    width: 150vh;
+    height: 100vh;
+    background-color: antiquewhite;
+  }
+
+
+  .searchBar{
+    margin-bottom: 10px;
+  }
+
+
+
+  /* Tabs and medium screens */
+@media screen and (min-width: 1000px) and (max-width: 1400px) {
+    .country-page{
+        width: 100vh;
+    }
+}
+
+
+
+
+
+
+/* mobiles & small screens */
+
+@media screen and (max-width: 1000px) {
+    .country-page{
+        width: 60vh;
+    }
+}

@@ -1,0 +1,40 @@
+
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+.global-page{
+    width: 150vh;
+    height: 100vh;
+    
+background-color: blanchedalmond;
+}
+
+.global-topics-container{
+    
+}
+
+
+
+/* Tabs and medium screens */
+@media screen and (min-width: 1000px) and (max-width: 1400px) {
+    .global-page{
+        width: 100vh;
+    }
+}
+
+
+
+
+
+
+/* mobiles & small screens */
+
+@media screen and (max-width: 1000px) {
+    .global-page{
+        width: 60vh;
+    }
+}

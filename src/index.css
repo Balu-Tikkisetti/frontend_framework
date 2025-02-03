@@ -1,0 +1,184 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+/* Body Styling */
+body {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+    margin: 0;
+    background: rgb(26,191,240);
+background: linear-gradient(90deg, rgba(26,191,240,1) 29%, rgba(4,52,50,1) 97%);
+}
+
+/* Main Container */
+.custom-container {
+    max-width: 800px;
+    width: 100%;
+    box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+    border-radius: 12px; /* Rounded corners */
+    background: #ffffff;
+    padding: 40px; /* Add consistent padding */
+    margin: 20px; /* Margin for smaller screens */
+    animation: fadeIn 1s ease-in-out; /* Optional fade-in effect */
+}
+
+/* Signup form  */
+#singupForm {
+    max-width: 800px;
+    width: 100%;
+    border-radius: 12px; /* Rounded corners */
+    background: transparent;
+    padding: 40px; /* Add consistent padding */
+    margin: 20px; /* Margin for smaller screens */
+    animation: fadeIn 1s ease-in-out; /* Optional fade-in effect */
+}
+
+/* Form Header */
+h2 {
+    font-family: 'Lobster', cursive;
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+
+
+/* Form Inputs */
+.form-floating input {
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    border: 1px solid #dbdbdb;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-floating input:focus {
+    border-color: #3897f0;
+    box-shadow: 0px 0px 5px rgba(56, 151, 240, 0.5);
+    outline: none;
+}
+
+
+
+
+
+/* Buttons */
+.btn-primary {
+    width: 100%;
+    background-color: #3897f0;
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    margin-top: 15px; /* Add spacing between buttons */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #287bb5;
+    box-shadow: 0px 4px 10px rgba(40, 123, 181, 0.5);
+}
+
+.btn-success {
+    width: 100%;
+    background-color: #28a745;
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    box-shadow: 0px 4px 10px rgba(33, 136, 56, 0.5);
+}
+
+/* OR Divider */
+.or-divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    color: #8e8e8e;
+    font-weight: bold;
+}
+
+.or-divider::before,
+.or-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #dbdbdb;
+    margin: 0 10px;
+}
+
+/* Forgot Password Link */
+.forgot-password-link a {
+    font-size: 14px;
+    color: #3897f0;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.forgot-password-link a:hover {
+    color: #287bb5;
+    text-decoration: underline;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .container {
+        max-width: 80%; /* Slightly reduce width on medium screens */
+        padding: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        max-width: 90%; /* Adjust for smaller screens */
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 28px; /* Reduce heading size on small screens */
+    }
+
+    .form-floating input {
+        font-size: 13px; /* Adjust input size */
+    }
+
+    .btn-primary,
+    .btn-success {
+        padding: 10px;
+        font-size: 14px; /* Smaller buttons */
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        max-width: 95%; /* Ensure full usability on very small screens */
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+}

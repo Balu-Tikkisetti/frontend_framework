@@ -1,15 +1,19 @@
 import "./App.css";
-import "./components.css";
+import "./css/components.css";
 import { useState } from "react";
-import Feeder from "./components/feeder_section.tsx";
-import Random from "./components/Random.tsx";
-import NavigationBar from "./components/navigator.tsx";
-import Postings from "./components/posting_section.tsx";
-import Profile from "./components/Profile.tsx";
-import Search from "./components/Search.tsx";
-import Notification_section from "./components/notification_section.tsx";
 
-function CollegeMedia() {
+
+import Global from "./components/Global.tsx";
+import Country from "./components/Country.tsx";
+import Community from "./components/Community.tsx";
+import TrendingTopics from "./components/TrendingTopics.tsx";
+import Notifications from "./components/Notifications.tsx";
+import Profile from "./components/Profile.tsx";
+import NavigationBar from "./components/Navigator.tsx";
+
+
+
+function TopicsWorld() {
   const [activeComponent, setActiveComponent] = useState("Feeder");
 
   const handleButtonClick = (componentName: string) => {
@@ -18,19 +22,18 @@ function CollegeMedia() {
 
   const renderComponent = () => {
     switch (activeComponent) {
-      case "Feeder":
-        return <Feeder />;
-      case "Subscribed":
-        return <Random />;
-      case "Search":
-        return <Search/>
-      case "Postings":
-        return <Postings />;
+      case "Global":
+        return <Global />;
+      case "Country":
+        return <Country />;
+      case "Community":
+        return <Community/>
+      case "TrendingTopics":
+        return <TrendingTopics />;
+      case "Notifications":
+          return <Notifications />;
       case "Profile":
         return <Profile />;
-      case "Notification_section":
-        return <Notification_section />;
-
       default:
         return null;
     }
@@ -39,6 +42,7 @@ function CollegeMedia() {
   return (
     <>
       <div className="app-container " id="main">
+
         <div className="main-content ">{renderComponent()}</div>
         <div className="fixed-bottom">
           <NavigationBar onButtonClick={handleButtonClick} />
@@ -48,4 +52,4 @@ function CollegeMedia() {
   );
 }
 
-export default CollegeMedia;
+export default TopicsWorld;

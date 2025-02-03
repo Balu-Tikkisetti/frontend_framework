@@ -1,10 +1,5 @@
-// NavigationBar.tsx
-
-import React, { useEffect, useState } from "react";
-import "../App.css";
-
-import axios from "axios";
-import { api } from "../model/constants";
+import React from "react";
+import "../css/Navigator.css";
 import { useParams } from "react-router-dom";
 
 interface NavigationBarProps {
@@ -12,28 +7,7 @@ interface NavigationBarProps {
 }
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ onButtonClick }) => {
-  const { user_id } = useParams();
-
-  const [profilePic, setProfilePic] = useState(null);
-
-  useEffect(() => {
-    const fetchProfilePic = async () => {
-      try {
-        const response = await axios.get(`${api}/getDp/${user_id}`, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        setProfilePic(response.data);
-        
-      } catch (e) {
-        alert("error while loading the profile picture " + e);
-      }
-    };
-    if (user_id) {
-      fetchProfilePic();
-    }
-  }, [user_id]);
+  const { username } = useParams();
 
   return (
     <div className="navigation-bar position-absolute bottom-0 start-50 translate-middle-x">
@@ -41,33 +15,34 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ onButtonClick }) => {
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
       ></link>
-      <button className="f-button n" onClick={() => onButtonClick("Feeder")}>
-        <i className="bi bi-house-door-fill"></i>
+      <button className="global-button n" onClick={() => onButtonClick("Global")}>
+        <i className="bi bi-globe"></i> {/* Icon for Global Section */}
       </button>
       <button
-        className="love-button n"
-        onClick={() => onButtonClick("Subscribed")}
+        className="country-button n"
+       
+        onClick={() => onButtonClick("Country")}
       >
-       <i className="bi bi-compass-fill"></i>
+        <i className="bi bi-flag-fill"></i> {/* Icon for Country Section */}
       </button>
       <button
-        className="search-button n"
-        onClick={() => onButtonClick("Search")}
+        className="community-button n"
+        onClick={() => onButtonClick("Community")}
       >
-        <i className="bi bi-search"></i>
+        <i className="bi bi-people-fill"></i> {/* Icon for Community Section */}
       </button>
       <button
-        className="plus-button n "
-        onClick={() => onButtonClick("Postings")}
+        className="trending-button n"
+        onClick={() => onButtonClick("TrendingTopics")}
       >
-        <i className="bi bi-cloud-arrow-up-fill"></i>
+        <i className="bi bi-graph-up-arrow"></i> {/* Icon for Trending Topics */}
       </button>
       <button
-        className="Notification_button n position-relative"
-        onClick={() => onButtonClick("Notification_section")}
+        className="notifications-button n position-relative"
+        onClick={() => onButtonClick("Notifications")}
         type="button"
       >
-        <i className="bi bi-bell-fill"></i>
+        <i className="bi bi-bell"></i> {/* Icon for Notifications */}
         <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
           0<span className="visually-hidden">unread messages</span>
         </span>
@@ -76,14 +51,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ onButtonClick }) => {
         className="profile-button n"
         onClick={() => onButtonClick("Profile")}
       >
-        <div>
-          {profilePic != null && profilePic !== "" ? (
-            <img src={`data:image;base64,${profilePic}`} alt="" className="pic_icon" />
-          ) : (
-            <i className="bi bi-person-fill"></i>
-          )}
-
-        </div>
+        <i className="bi bi-person-circle"></i> {/* Icon for Profile Section */}
       </button>
     </div>
   );
