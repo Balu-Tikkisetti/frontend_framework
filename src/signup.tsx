@@ -4,47 +4,55 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./App.css";
 import { api } from "./model/constants";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./context/AuthContext"; // ✅ Import AuthContext
+import { useAuth } from "./context/AuthContext";
 
 interface SignupProps {
   onClose: () => void;
 }
 
+interface FormData {
+  username: string;
+  gmail: string;
+  dob: Date | null;
+  password: string;
+  gender: string;
+}
+
+type InputChangeEvent = React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+type FormSubmitEvent = React.FormEvent<HTMLFormElement>;
+
 const Signup: React.FC<SignupProps> = ({ onClose }) => {
   const navigate = useNavigate();
-  const { fetchUser } = useAuth(); // ✅ Destructure fetchUser from AuthContext
+  const { fetchUser } = useAuth();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     username: "",
     gmail: "",
-    dob: null as Date | null, // ✅ Store Date object
+    dob: null,
     password: "",
     gender: "",
   });
-  const [passwordError, setPasswordError] = useState("");
 
-  // Handle input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const [error, setError] = useState<string>('');
+  const [passwordError, setPasswordError] = useState<string>('');
+
+  const handleChange = (e: InputChangeEvent) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
-  // Handle DatePicker change
   const handleDateChange = (date: Date | null) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      dob: date, // ✅ Store actual Date object
-    }));
+    setFormData({
+      ...formData,
+      dob: date
+    });
   };
 
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormSubmitEvent) => {
     e.preventDefault();
 
-    // Password validation
     const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
     if (!strongRegex.test(formData.password)) {
       setPasswordError(
@@ -53,21 +61,23 @@ const Signup: React.FC<SignupProps> = ({ onClose }) => {
       return;
     }
 
-    setPasswordError(""); // ✅ Clear previous errors
+    setPasswordError("");
 
     try {
-      // ✅ Use FormData for sending data
       const formSubmission = new FormData();
       formSubmission.append("username", formData.username);
       formSubmission.append("gmail", formData.gmail);
       formSubmission.append("password", formData.password);
-      formSubmission.append("dob", formData.dob ? formData.dob.toISOString().split("T")[0] : ""); // Format YYYY-MM-DD
+      formSubmission.append(
+        "dob",
+        formData.dob ? formData.dob.toISOString().split("T")[0] : ""
+      );
       formSubmission.append("gender", formData.gender);
 
-      // Signup API call
       const response = await fetch(api + "/signup", {
         method: "POST",
-        body: formSubmission, // ✅ Sending as FormData (no JSON)
+        body: formSubmission,
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -76,101 +86,127 @@ const Signup: React.FC<SignupProps> = ({ onClose }) => {
       }
 
       const data = await response.json();
-
-      // ✅ Set user in AuthContext
-      await fetchUser({ userId: data.id, username: data.username });
-
-      // ✅ Navigate to the topics world page
+      await fetchUser({ userId: data.id, accessToken: data.accessToken });
       navigate("/topicsWorld");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error occurred during signup:", error);
-      alert(error.message);
+      setError(error instanceof Error ? error.message : "An unexpected error occurred");
     }
   };
 
   return (
-    <form id="signupForm" onSubmit={handleSubmit}>
-      <div className="form-floating mb-3">
-        <input
-          type="text"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-          className="form-control"
-          id="username"
-          placeholder="Username"
-          required
-        />
-        <label htmlFor="username">Username</label>
-      </div>
+    <div className="container-fluid vh-100 d-flex align-items-center justify-content-center signup-overlay">
+      <div className="card signup-card">
+        <div className="card-body p-4 p-md-5">
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h2 className="company-title m-0">Create Account</h2>
+            
+          </div>
 
-      <div className="form-floating mb-3">
-        <input
-          type="email"
-          name="gmail"
-          value={formData.gmail}
-          onChange={handleChange}
-          className="form-control"
-          id="gmail"
-          placeholder="Gmail"
-          required
-        />
-        <label htmlFor="gmail">Gmail</label>
-      </div>
+          {(error || passwordError) && (
+            <div className="alert alert-danger" role="alert">
+              {error || passwordError}
+            </div>
+          )}
 
-      <div className="form-floating mb-3">
-        <DatePicker
-          selected={formData.dob}
-          onChange={handleDateChange}
-          placeholderText="Date of Birth"
-          className="form-control"
-          id="dob"
-          required
-          dateFormat="yyyy-MM-dd" // ✅ Proper formatting
-        />
-      </div>
+          <form onSubmit={handleSubmit} className="needs-validation">
+            <div className="mb-3">
+              <label htmlFor="signup-username" className="form-label">
+                Username
+              </label>
+              <input
+                type="text"
+                id="signup-username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className="form-control"
+                required
+              />
+            </div>
 
-      <div className="form-floating mb-3">
-        <select
-          name="gender"
-          value={formData.gender}
-          onChange={handleChange}
-          className="form-select"
-          id="gender"
-          required
-        >
-          <option value="" disabled>
-            Select Gender
-          </option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-        </select>
-        <label htmlFor="gender">Gender</label>
-      </div>
+            <div className="mb-3">
+              <label htmlFor="signup-email" className="form-label">
+                Email
+              </label>
+              <input
+                type="email"
+                id="signup-email"
+                name="gmail"
+                value={formData.gmail}
+                onChange={handleChange}
+                className="form-control"
+                required
+              />
+            </div>
 
-      <div className="form-floating mb-3">
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          className="form-control"
-          id="password"
-          placeholder="Password"
-          required
-        />
-        <label htmlFor="password">Password</label>
-        {passwordError && <div className="text-danger">{passwordError}</div>}
-      </div>
+            <div className="mb-3">
+              <label htmlFor="signup-dob" className="form-label">
+                Date of Birth
+              </label>
+              <DatePicker
+                selected={formData.dob}
+                onChange={handleDateChange}
+                className="form-control"
+                dateFormat="yyyy-MM-dd"
+                required
+                placeholderText="Select date"
+              />
+            </div>
 
-      <button type="submit" className="btn btn-primary w-100">
-        Create
-      </button>
-      <button type="button" className="btn btn-success w-100 mt-2" onClick={onClose}>
-        Cancel
-      </button>
-    </form>
+            <div className="mb-3">
+              <label htmlFor="signup-gender" className="form-label">
+                Gender
+              </label>
+              <select
+                id="signup-gender"
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="form-select"
+                required
+              >
+                <option value="" disabled>Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="signup-password" className="form-label">
+                Password
+              </label>
+              <input
+                type="password"
+                id="signup-password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="form-control"
+                required
+              />
+            </div>
+
+            <div className="d-grid gap-2">
+              <button
+                type="submit"
+                className="btn btn-primary btn-lg mb-2"
+              >
+                Create Account
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn btn-outline-secondary btn-lg"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 };
 

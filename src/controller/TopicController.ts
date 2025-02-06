@@ -58,18 +58,28 @@ export const createNewTopic = async (userId: number,text: string, location: stri
 
 export const deleteTopic = async (userId: number, topicId: string): Promise<void> => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/topics/deletetopic`, {
-      params: { userId, topicId }, // ✅ Ensure correct parameters
-      withCredentials: true, // ✅ Send JWT if required
+    if (!userId || !topicId) {
+      throw new Error(" Missing userId or topicId. Deletion aborted.");
+    }
+
+    // ✅ Use FormData for sending data in the DELETE request
+    const formData = new FormData();
+    formData.append("userId", userId.toString());
+    formData.append("topicId", topicId);
+
+    const response = await axios.delete(`${API_BASE_URL}/topics/deleteTopic`, {
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
     });
 
     if (response.status === 200) {
-      console.log("Topic deleted successfully!");
+      console.log("✅ Topic deleted successfully!");
     } else {
-      throw new Error("Failed to delete topic.");
+      throw new Error(" Failed to delete topic.");
     }
   } catch (error) {
-    console.error("Error deleting topic:", error);
+    console.error(" Error deleting topic:", error);
     throw error;
   }
 };
+

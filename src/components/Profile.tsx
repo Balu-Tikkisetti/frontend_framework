@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../css/Profile.css";
@@ -6,15 +7,44 @@ import Topic from "../model/Topic";
 import UserProfile from "../model/Userprofile";
 import { useAuth } from "../context/AuthContext";
 import profilePic from "../assets/unisex-profile-pic.png";
-import { fetchUserTopics, createNewTopic } from "../controller/TopicController";
-import { fetchProfileData } from "../controller/ProfileController";
+import {
+  fetchUserTopics,
+  createNewTopic,
+  deleteTopic,
+} from "../controller/TopicController";
+import { deleteUser, fetchProfileData } from "../controller/ProfileController";
 import "../css/TopicCard.css";
+import EditTopicModal from "./EditTopicModal";
+import OpinionsModal from "./OpinionsModal";
+import {
+  addUpvote,
+  removeUpvote,
+  getUpvoteCount,
+  hasUserUpvoted,
+} from "../controller/UpvoteController";
 
 const Profile: React.FC = () => {
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [showTopics, setShowTopics] = useState(true);
-  const [newTopicText, setNewTopicText] = useState("@");
+  const [newTopicText, setNewTopicText] = useState("");
   const [newTopicPhoto, setNewTopicPhoto] = useState<File | null>(null);
+
+  const [isOpinionsModalOpen, setIsOpinionsModalOpen] = useState(false);
+  const [selectedTopicForOpinions, setSelectedTopicForOpinions] =
+    useState<Topic | null>(null);
+
+  const [selectedTopic, setSelectedTopic] = useState<{
+    text: string;
+    id: string;
+  } | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // ✅ Upvotes State Management
+  const [upvotes, setUpvotes] = useState<{ [topicId: string]: number }>({});
+  const [userUpvotes, setUserUpvotes] = useState<{
+    [topicId: string]: boolean;
+  }>({});
+
   const [newTopicPhotoPreview, setNewTopicPhotoPreview] = useState<
     string | null
   >(null);
@@ -36,7 +66,10 @@ const Profile: React.FC = () => {
       .catch((error) => console.error("Error loading profile:", error));
 
     fetchUserTopics(userId)
-      .then(setTopics)
+      .then(async (fetchedTopics) => {
+        setTopics(fetchedTopics);
+        fetchUpvotes(fetchedTopics); // ✅ Fetch upvotes after loading topics
+      })
       .catch((error) => console.error("Error loading topics:", error));
 
     if (navigator.geolocation) {
@@ -78,20 +111,116 @@ const Profile: React.FC = () => {
     }
   };
 
-  const handleDeleteTopic = (topicText: string, topicId: string) => {
-    if (window.confirm(`Are you sure you want to delete "${topicText}"?`)) {
-      deleteTopic(userId, topicId)
-        .then(() => {
-          // ✅ Update state to remove deleted topic from UI
-          setTopics((prevTopics) =>
-            prevTopics.filter((topic) => topic.id !== topicId)
-          );
-          alert("Topic deleted successfully!");
+  const fetchUpvotes = async (topics: Topic[]) => {
+    if (!userId) return;
+
+    try {
+      // ✅ Fetch upvote counts for all topics
+      const upvoteCounts = await Promise.all(
+        topics.map(async (topic) => {
+          const count = await getUpvoteCount(topic.id.toString());
+          return { topicId: topic.id.toString(), count };
         })
-        .catch((error) => {
-          console.error("Error deleting topic:", error);
-          alert("Failed to delete topic. Please try again.");
-        });
+      );
+
+      // ✅ Fetch user upvote status for all topics
+      const userUpvoteStatuses = await Promise.all(
+        topics.map(async (topic) => {
+          const upvoted = await hasUserUpvoted(userId, topic.id.toString());
+          return { topicId: topic.id.toString(), upvoted };
+        })
+      );
+
+      // ✅ Update state
+      setUpvotes(
+        Object.fromEntries(
+          upvoteCounts.map(({ topicId, count }) => [topicId, count])
+        )
+      );
+      setUserUpvotes(
+        Object.fromEntries(
+          userUpvoteStatuses.map(({ topicId, upvoted }) => [topicId, upvoted])
+        )
+      );
+    } catch (error) {
+      console.error("❌ Error fetching upvotes:", error);
+    }
+  };
+
+  const toggleUpvote = async (topicId: string) => {
+    if (!userId) return;
+
+    const currentUpvoted = userUpvotes[topicId] || false;
+    const newUpvotes = {
+      ...upvotes,
+      [topicId]: (upvotes[topicId] || 0) + (currentUpvoted ? -1 : 1),
+    };
+    const newUserUpvotes = { ...userUpvotes, [topicId]: !currentUpvoted };
+
+    // ✅ Optimistic UI update
+    setUpvotes(newUpvotes);
+    setUserUpvotes(newUserUpvotes);
+
+    try {
+      if (!currentUpvoted) {
+        await addUpvote(userId, topicId); // ✅ Call UpvoteController function
+      } else {
+        await removeUpvote(userId, topicId); // ✅ Call UpvoteController function
+      }
+    } catch (error) {
+      console.error("❌ Error updating upvote:", error);
+      // ❌ Revert UI on failure
+      setUpvotes(upvotes);
+      setUserUpvotes(userUpvotes);
+    }
+  };
+
+  const handleDeleteTopic = async (topicText: string, topicId: string) => {
+    if (!userId) {
+      alert(" User not authenticated!");
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${topicText}"?`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await deleteTopic(userId, topicId);
+      alert("✅ Topic deleted successfully!");
+
+      // ✅ Remove the topic from state after successful deletion
+      setTopics((prevTopics) =>
+        prevTopics.filter((topic) => topic.id !== topicId)
+      );
+    } catch (error) {
+      alert(" Error deleting topic. Please try again.");
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!userId) {
+      alert("❌ User not authenticated!");
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete this account with username "${
+        profileData?.username || "Unknown"
+      }" and "${topics.length} topic${topics.length !== 1 ? "s" : ""}"?`
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      alert("⏳ Deleting account... Please wait.");
+      await deleteUser(userId);
+      // ✅ Inform user & redirect to home page (or login page)
+      alert("✅ Account deleted successfully!");
+      window.location.href = "/";
+    } catch (error) {
+      alert(" Error deleting account. Please try again.");
     }
   };
 
@@ -130,6 +259,24 @@ const Profile: React.FC = () => {
     }
   };
 
+  const openEditModal = (topicText: string, topicId: string) => {
+    setSelectedTopic({ text: topicText, id: topicId });
+    setIsModalOpen(true);
+  };
+
+  const openOpinionsModal = (topic: Topic) => {
+    setSelectedTopicForOpinions(topic);
+    setIsOpinionsModalOpen(true);
+  };
+
+  const handleSaveEdit = (updatedText: string, topicId: string) => {
+    console.log(`Saving topic: ${topicId} with new text: ${updatedText}`);
+    // TODO: Call API to update topic in the backend
+    setIsModalOpen(false);
+  };
+
+  const handleLogout = () => {};
+
   if (!profileData) {
     return <div>Loading...</div>;
   }
@@ -150,7 +297,28 @@ const Profile: React.FC = () => {
             <div className="sidebar-item">
               Supported: {profileData.supported}
             </div>
-            <div className="sidebar-item">Settings</div>
+            <div className="sidebar-item ">
+              <button type="button" className="btn btn-warning w-35">
+                Edit Profile
+              </button>
+            </div>
+            <div className="sidebar-item">
+              <button
+                type="button"
+                className="btn btn-primary w-35"
+                onClick={handleLogout}
+              >
+                Exit
+              </button>
+            </div>
+            <div className="sidebar-item">
+              <button
+                className="btn btn-danger w-35"
+                onClick={handleDeleteAccount}
+              >
+                Delete Account
+              </button>
+            </div>
           </div>
         </div>
 
@@ -179,39 +347,92 @@ const Profile: React.FC = () => {
             <div className="profile-topics-section">
               {showTopics ? (
                 <div className="topics-list overflow-auto">
-                  <h3>Topics</h3>
-
                   {topics.map((topic: Topic) => (
-                    <div key={topic.id} className="topic-card">
-                      <div className="topic-edit-delete">
-                        <span className="edit-btn">
-                          <i className="bi bi-pen"></i>
-                        </span>
-                        <span
-                          className="delete-btn"
-                          onClick={() =>
-                            handleDeleteTopic(topic.text, topic.id)
-                          }
-                        >
-                          <i className="bi bi-trash3"></i>
-                        </span>
+                    <div key={topic.id.toString()} className="topic-card">
+                      {" "}
+                      <div className="topic-header">
+                        <div className="profile-section">
+                          <img
+                            src={profileData.profilePic || profilePic}
+                            alt="Profile"
+                            className="topic-profile-pic "
+                          />
+                          <span className="topic-username">
+                            {profileData.username} - {topic.location}
+                          </span>
+                        </div>
+
+                        <div className="topic-edit-delete">
+                          <span
+                            className="edit-btn"
+                            onClick={() =>
+                              openEditModal(topic.text, topic.id.toString())
+                            }
+                          >
+                            <i className="bi bi-pen"></i>
+                          </span>
+
+                          <span
+                            className="delete-btn"
+                            onClick={() =>
+                              handleDeleteTopic(topic.text, topic.id.toString())
+                            } // ✅ Convert ObjectId to string
+                          >
+                            <i className="bi bi-trash3"></i>
+                          </span>
+                        </div>
                       </div>
-
                       <p>@ {topic.text}</p>
-
                       <div className="topic-actions ">
-                        <div className="icon-container">
+                        <div
+                          className="icon-container opinion-container"
+                          onClick={() => openOpinionsModal(topic)}
+                        >
                           <i className="bi bi-chat-square"></i>
                         </div>
+
                         <div className="icon-container">
                           <i className="bi bi-send"></i>
                         </div>
-                        <div className="icon-container">
-                          <i className="bi bi-star"></i>
+                        <div
+                          className={`icon-container upvote-container ${
+                            userUpvotes[topic.id.toString()] ? "upvoted" : ""
+                          }`}
+                          onClick={() => toggleUpvote(topic.id.toString())}
+                        >
+                          <i className="bi bi-rocket"></i>
+                          <span className="upvote-count">
+                            {upvotes[topic.id.toString()] || 0}
+                          </span>
                         </div>
                       </div>
                     </div>
                   ))}
+
+                  {/* ✅ Render Modal */}
+                  {selectedTopic && (
+                    <EditTopicModal
+                      show={isModalOpen}
+                      onClose={() => setIsModalOpen(false)}
+                      topicText={selectedTopic.text}
+                      topicId={selectedTopic.id}
+                      onSave={handleSaveEdit}
+                    />
+                  )}
+
+                  {selectedTopicForOpinions && (
+                    <OpinionsModal
+                      show={isOpinionsModalOpen}
+                      onClose={() => setIsOpinionsModalOpen(false)}
+                      topicText={selectedTopicForOpinions.text}
+                      topicId={selectedTopicForOpinions.id.toString()}
+                      topicImage={selectedTopicForOpinions.topicImage || null}
+                      username={profileData.username}
+                      userProfilePic={profileData.profilePic || null}
+                      location={selectedTopicForOpinions.location}
+                      timestamp={selectedTopicForOpinions.timestamp}
+                    />
+                  )}
                 </div>
               ) : (
                 <div className="topic-create">

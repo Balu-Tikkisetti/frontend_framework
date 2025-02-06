@@ -36,4 +36,26 @@ export const fetchProfileData = async (userId: number): Promise<UserProfile> => 
 };
 
 
+export const deleteUser = async (userId: number): Promise<void> => {
+  try {
+    if (!userId) throw new Error("User ID is missing");
+
+    const response = await axios.delete(`${API_BASE_URL}/deleteuser`, {
+      params: { userId }, // ✅ Send userId as query parameter
+    
+    });
+
+    if (response.status === 200) {
+      console.log("✅ User deleted successfully!");
+    } else {
+      throw new Error(" Failed to delete user.");
+    }
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw error;
+  }
+};
+
+
+
 

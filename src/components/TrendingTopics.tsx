@@ -1,10 +1,11 @@
+import Search from "./header-components/Search";
 
 
 const TrendingTopics=()=>{
    
     return (
-        <div>
-            
+        <div className="trending-topics">
+            <Search />
         </div>
     )
 }

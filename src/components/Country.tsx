@@ -6,6 +6,7 @@ import profilePic from "../assets/unisex-profile-pic.png";
 import axios from "axios";
 import CountryTopic from "../model/CountryTopic"; // ✅ Use CountryTopic model
 import { fetchCountryTopics } from "../controller/CountryController"; // ✅ API function
+import Search from "./header-components/Search";
 
 const Country = () => {
   const [currentLocation, setCurrentLocation] = useState<{ city: string; state: string; country: string } | null>(null);
@@ -63,19 +64,7 @@ const Country = () => {
   return (
     <div className="country-page">
       {/* Search Container */}
-      <nav className="navbar navbar-light bg-dark w-100 searchBar">
-        <form className="form-inline d-flex w-100" onSubmit={(e) => e.preventDefault()}>
-          <input
-            className="form-control flex-grow-1 mx-2"
-            type="search"
-            placeholder="Search topics..."
-            aria-label="Search"
-          />
-          <button className="btn btn-outline-success" type="submit">
-            <i className="bi bi-binoculars-fill"></i>
-          </button>
-        </form>
-      </nav>
+      <Search />
 
       {/* Country Topics Container */}
       <div className="country-topics-container ">
@@ -115,7 +104,7 @@ const Country = () => {
                         <i className="bi bi-send"></i>
                       </div>
                       <div className="icon-container">
-                        <i className="bi bi-star"></i>
+                      <i className="bi bi-rocket"></i>
                       </div>
                      
                     </div>

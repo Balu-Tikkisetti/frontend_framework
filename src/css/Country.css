@@ -1,39 +1,53 @@
-*{
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-
-  .country-page{
-    width: 150vh;
-    height: 100vh;
-    background-color: antiquewhite;
-  }
-
-
-  .searchBar{
-    margin-bottom: 10px;
-  }
-
-
-
-  /* Tabs and medium screens */
-@media screen and (min-width: 1000px) and (max-width: 1400px) {
-    .country-page{
-        width: 100vh;
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
+.country-page {
+  width: 150vh;
+  height: 100vh;
+ 
+  position: relative; /* Add this to establish positioning context */
+  display: flex;
+  flex-direction: column;
+}
 
+/* Fixed search bar at the top */
+.searchBar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: antiquewhite; /* Match parent background */
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
 
+/* Scrollable content area */
+.country-topics-container {
+  flex: 1; /* Take remaining space */
+  overflow-y: auto;
+  padding: 0 10px; /* Add some horizontal padding */
+}
 
+.topic-list {
+  padding-bottom: 20px; /* Add some bottom padding for last item */
+}
 
+/* Tabs and medium screens */
+@media screen and (min-width: 1000px) and (max-width: 1400px) {
+  .country-page {
+    width: 100vh;
+  }
+}
 
 /* mobiles & small screens */
-
 @media screen and (max-width: 1000px) {
-    .country-page{
-        width: 60vh;
-    }
+  .country-page {
+    width: 60vh;
+  }
+  
+  .country-topics-container {
+    padding: 0 5px; /* Smaller padding on mobile */
+  }
 }

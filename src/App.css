@@ -1,110 +1,168 @@
+/* Import Bootstrap CSS */
 @import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'react-datepicker/dist/react-datepicker.css';
 
-/* signupform css */
+/* Custom Variables */
+:root {
+  --primary-blue: #3897f0;
+  --hover-blue: #287bb5;
+  --gradient-start: #4facfe;
+  --gradient-end: #00f2fe;
+}
 
-#singupForm {
+/* Common Container Styles */
+.login-container,
+.signup-overlay {
   /* background-color: #f8f9fa; */
-  background: transparent;
-  padding: 20px;
-  max-width: 450px; /* Make form a bit narrower */
-  margin: 0 auto;
-  border-radius: 10px;
-  /* box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); */
+  min-height: 100vh;
 }
 
-.close-button {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  margin-bottom: 10px;
+.signup-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1050;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="password"],
-select {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.row.g-3 .col-md-6 {
-  flex: 1;
-  margin-bottom: 10px;
-}
-
-.date-picker-wrapper,
-.select-wrapper {
-  display: flex;
-  width: 100%;
-  gap: 10px; /* Space between items */
-}
-
-.date-picker-wrapper input,
-.select-wrapper select,
-.password-wrapper input {
-  width: 100%; /* Full width for individual elements */
-}
-
-.password-wrapper {
-  display: flex;
-  gap: 10px;
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 10px;
-  background-color: #3897f0;
+/* Card Styles */
+.login-card,
+.signup-card {
+  max-width: 450px;
+  width: 90%;
   border: none;
-  border-radius: 4px;
-  color: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.signup-card {
+  position: relative;
+  margin: 1.75rem auto;
+}
+
+/* Company Title Styles */
+.company-title {
+  font-size: 2.5rem;
   font-weight: bold;
+  background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Control Styles */
+.form-control,
+.form-select {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(56, 151, 240, 0.25);
+}
+
+/* DatePicker Custom Styles */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease;
+}
+
+.react-datepicker__input-container input:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(56, 151, 240, 0.25);
+  outline: none;
+}
+
+/* Button Styles */
+.btn-primary {
+  background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-  background-color: #287bb5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(45deg, var(--gradient-start), var(--primary-blue));
 }
 
+.btn-outline-secondary {
+  border: 2px solid #dee2e6;
+  color: #6c757d;
+  transition: all 0.3s ease;
+}
 
+.btn-outline-secondary:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-1px);
+}
 
+/* Close Button Styles */
+.btn-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
 
+.btn-close:hover {
+  opacity: 1;
+}
 
+/* Alert Styles */
+.alert {
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
 
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+  .login-card,
+  .signup-card {
+    width: 95%;
+    margin: 1rem;
+  }
 
+  .company-title {
+    font-size: 2rem;
+  }
 
+  .card-body {
+    padding: 1.5rem !important;
+  }
+}
 
+/* Animation */
+.login-card,
+.signup-card {
+  animation: fadeIn 0.5s ease-out;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

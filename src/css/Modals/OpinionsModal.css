@@ -1,0 +1,111 @@
+/* Modal Styling */
+.opinions-modal {
+    background: rgba(0, 0, 0, 0.5); /* Dark background overlay */
+  }
+  
+  /* Topic Card */
+  .topic-card {
+    background: linear-gradient(135deg, #2b2b2b, #1a1a1a);
+    color: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+  }
+  
+  /* Profile Section */
+  .profile-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .topic-profile-pic,
+  .opinion-profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 2px solid #041479;
+  }
+  
+  /* Topic Details */
+  .topic-text {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  
+  /* Opinions Section */
+  .opinions-section {
+    margin-top: 20px;
+  }
+  
+  .opinion-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .opinion-content {
+    flex: 1;
+  }
+  
+  .opinion-username {
+    font-weight: bold;
+    color: white;
+  }
+  
+  .opinion-text {
+    margin: 5px 0;
+    color: #ccc;
+  }
+  
+  /* Highlight the Opinions icon */
+  .opinion-active {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+  }
+  
+  /* Opinion Input Container */
+  .opinion-input-container {
+    display: flex;
+    align-items: center;
+    background: #1a1a1a;
+    border: 2px solid skyblue;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px;
+  }
+  
+  /* Opinion Input Field */
+  .opinion-input {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 1rem;
+  }
+  
+  .opinion-input::placeholder {
+    color: #bbb;
+  }
+  
+  /* Send Opinion Button */
+  .send-opinion-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: skyblue;
+    font-size: 1.5rem;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .send-opinion-btn:hover {
+    transform: scale(1.2);
+  }
+  
