@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import profilePic from "../../assets/unisex-profile-pic.png";
-import { searchUsers, searchTopics } from "../../controller/SearchController";
+import { searchUsers, searchTopics, updateSupported, deleteSupport, searchUserViewDetails } from "../../controller/SearchController";
 import "../../css/Search.css";
 import { useAuth } from "../../context/AuthContext";
+import SearchUserViewModal from "../SearchUserViewModal";
 
 // Update interfaces to include isSupported flag
 interface Topic {
@@ -16,7 +17,7 @@ interface Topic {
 }
 
 interface User {
-  id: string;
+  id: number;
   username: string;
   profilePic?: string;
   isSupported: boolean;
@@ -27,6 +28,8 @@ const Search: React.FC = () => {
   const [userResults, setUserResults] = useState<User[]>([]);
   const [topicResults, setTopicResults] = useState<Topic[]>([]);
   const [activeSection, setActiveSection] = useState<'all' | 'users' | 'topics'>('all');
+  const [userModalData, setUserModalData] = useState<any>(null);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const { userId } = useAuth();
@@ -68,19 +71,29 @@ const Search: React.FC = () => {
     }
   };
 
-  const handleSupportClick = async (userId: string, currentStatus: boolean) => {
+  const handleSupportClick = async (supportedUserId: number, currentStatus: boolean) => {
+    if (!userId) {
+      alert("❌ Unauthorized support request");
+      return;
+    }
+  
     try {
-      // Add your support/unsupport API call here
-      // Update the local state after successful API call
-      setUserResults(prevUsers =>
-        prevUsers.map(user =>
-          user.id === userId
-            ? { ...user, isSupported: !currentStatus }
-            : user
-        )
-      );
+      let success;
+      if (currentStatus) {
+        success = await deleteSupport(userId, supportedUserId);
+      } else {
+        success = await updateSupported(userId, supportedUserId);
+      }
+  
+      if (success) {
+        setUserResults((prevUsers: any[]) =>
+          prevUsers.map((user) =>
+            user.id === supportedUserId ? { ...user, isSupported: !currentStatus } : user
+          )
+        );
+      }
     } catch (error) {
-      console.error("Error updating support status:", error);
+      console.error("❌ Error updating support status:", error);
     }
   };
 
@@ -106,6 +119,18 @@ const Search: React.FC = () => {
 
   const shouldShowSection = (sectionName: 'users' | 'topics') => {
     return activeSection === 'all' || activeSection === sectionName;
+  };
+
+
+  const openUserSearchView = async (selectedUserId: number) => {
+    try {
+      if (!userId) return alert("Unauthorized");
+      const userDetails = await searchUserViewDetails(selectedUserId);
+      setUserModalData(userDetails);
+      setIsUserModalOpen(true);
+    } catch (error) {
+      console.error("Error opening user view details:", error);
+    }
   };
 
   return (
@@ -158,7 +183,7 @@ const Search: React.FC = () => {
                 {userResults.length > 0 ? (
                   userResults.map((user, index) => (
                     <div key={user.id || `user-${index}`} className="result-item">
-                      <div className="result-content">
+                      <div className="result-content" onClick={() => openUserSearchView(user.id)}>
                         <img
                           src={user.profilePic || profilePic}
                           alt="User"
@@ -213,6 +238,12 @@ const Search: React.FC = () => {
           </div>
         )}
       </div>
+      {isUserModalOpen && userModalData && (
+        <SearchUserViewModal
+          userProfile={userModalData}
+          onClose={() => setIsUserModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

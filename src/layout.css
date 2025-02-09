@@ -1,0 +1,100 @@
+/* 🌟 General Layout */
+.layout-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #87CEFA, #00BFFF) !important;
+    position: relative;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* 🌟 Mobile Action Buttons */
+  .mobile-action-button {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .mobile-action-button:hover {
+    transform: scale(1.1);
+  }
+  
+  /* 🌟 Sidebar (Left & Right Panels) */
+  .sidebar {
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    overflow-y: auto;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  /* ✅ Responsive Sidebar */
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      width: 250px;
+      height: 100vh;
+      z-index: 50;
+      transform: translateX(-100%);
+    }
+  
+    .sidebar.d-block {
+      transform: translateX(0);
+    }
+  }
+  
+  /* 🌟 Main Container */
+  .main-container {
+    flex: 1;
+    min-height: 100vh;
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* 🌟 Navigation Bar */
+  .navigation-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    z-index: 30;
+    text-align: center;
+  }
+  
+  /* 🌟 Scrollbar Customization */
+  .layout-container::-webkit-scrollbar,
+  .sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .layout-container::-webkit-scrollbar-track,
+  .sidebar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+  }
+  
+  .layout-container::-webkit-scrollbar-thumb,
+  .sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+  
+  .sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
+  
+  /* ✅ Responsive Fixes */
+  @media (max-width: 768px) {
+    .main-container {
+      padding-top: 60px;
+    }
+  }
+  
