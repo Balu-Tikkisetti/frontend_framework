@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import OpinionsModal from "./OpinionsModal";
 import profilePic from "../assets/unisex-profile-pic.png";
+import { useAuth } from "../context/AuthContext";
+import { sendMessageRequest } from "../controller/SearchController";
 
 // Define the topic interface
 export interface Topic {
@@ -14,10 +16,11 @@ export interface Topic {
 
 // Define the user profile interface
 export interface UserProfile {
-  id: number;
+  userId: number;
   username: string;
   profilePic?: string;
   supportersCount: number;
+  supportedCount:number;
   topicsCount: number;
   topics: Topic[];
   // Add additional fields as required
@@ -34,14 +37,14 @@ const SearchUserViewModal: React.FC<SearchUserViewModalProps> = ({ userProfile, 
   const [isOpinionsModalOpen, setIsOpinionsModalOpen] = useState<boolean>(false);
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
   
-  // State for opinion input (shared by topics; in a real app you may want per-topic opinion states)
-  const [opinionText, setOpinionText] = useState<string>("");
 
   // Local state for topics (populated from the userProfile prop)
   const [topics, setTopics] = useState<Topic[]>([]);
   // Upvote tracking: store counts and whether the current user has upvoted each topic
   const [upvotes, setUpvotes] = useState<Record<string, number>>({});
   const [userUpvotes, setUserUpvotes] = useState<Record<string, boolean>>({});
+
+  const { userId } = useAuth();
 
   // Initialize topics and upvotes from userProfile when the modal loads or changes
   useEffect(() => {
@@ -72,13 +75,7 @@ const SearchUserViewModal: React.FC<SearchUserViewModalProps> = ({ userProfile, 
     });
   };
 
-  // Handle opinion submission for a topic – replace the console.log with your API integration later
-  const handleOpinionSubmit = (topic: Topic) => {
-    if (!opinionText.trim()) return;
-    console.log(`Submitting opinion for topic ${topic.id}:`, opinionText);
-    // TODO: Integrate your opinion-post API here
-    setOpinionText("");
-  };
+
 
   // Open the OpinionsModal for a given topic
   const openOpinionsModal = (topic: Topic) => {
@@ -92,9 +89,20 @@ const SearchUserViewModal: React.FC<SearchUserViewModalProps> = ({ userProfile, 
   };
 
   // Handle message request – add your business logic for messaging here
-  const handleMessageRequest = () => {
-    console.log(`Message request sent for user: ${userProfile.username}`);
-    // TODO: Implement message request logic or navigate to a messaging view
+  const handleMessageRequest = async (recipientId:number) => {
+     let currentUserId=userId;
+     if (!currentUserId) {
+      return alert("Unauthorized");
+    }
+    console.log(currentUserId);
+    console.log(recipientId);
+    try {
+      await sendMessageRequest(currentUserId, recipientId);
+      console.log(`Message request sent for user: ${recipientId}`);
+      // Optionally, display a success notification in your UI
+    } catch (error) {
+      console.error("Error sending message request", error);
+    }
   };
 
   return (
@@ -134,12 +142,16 @@ const SearchUserViewModal: React.FC<SearchUserViewModalProps> = ({ userProfile, 
                     <p className="mb-0">
                       {userProfile.supportersCount} Supporter{userProfile.supportersCount !== 1 && "s"} | {userProfile.topicsCount} Topic{userProfile.topicsCount !== 1 && "s"}
                     </p>
+                    <p className="mb-0">
+                      {userProfile.supportersCount} Supported{userProfile.supportedCount !== 1 && "s"}
+                    </p>
                   </div>
                 </div>
                 <div className="mt-2">
-                  <button className="btn btn-primary" onClick={handleMessageRequest}>
-                    Message Request
+                  <button className="btn btn-primary" onClick={() => handleMessageRequest(userProfile.userId)}>
+                    Message Request  
                   </button>
+                
                 </div>
               </div>
 
@@ -166,17 +178,7 @@ const SearchUserViewModal: React.FC<SearchUserViewModalProps> = ({ userProfile, 
                           </button>
                         </div>
                       </div>
-                      <div className="opinion-input mt-2">
-                        <textarea
-                          className="form-control"
-                          placeholder="Share your opinion..."
-                          value={opinionText}
-                          onChange={(e) => setOpinionText(e.target.value)}
-                        />
-                        <button className="btn btn-primary mt-2" onClick={() => handleOpinionSubmit(topic)}>
-                          Post Opinion
-                        </button>
-                      </div>
+    
                     </div>
                   ))
                 ) : (

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@react-three/fiber": "^8.17.10",
+    "@stomp/stompjs": "^7.0.0",
     "@tanstack/react-query": "^5.66.0",
     "axios": "^1.6.7",
     "bootstrap": "^5.3.2",
@@ -24,14 +25,18 @@
     "react-toastify": "^10.0.4",
     "react-webcam": "^7.2.0",
     "simplex-noise": "^4.0.3",
+    "sockjs-client": "^1.6.1",
     "three": "^0.170.0",
     "three-orbitcontrols": "^2.110.3",
     "wouter": "^3.0.1"
   },
   "devDependencies": {
+    "@azure/static-web-apps-cli": "^2.0.2",
     "@types/react": "^18.2.55",
     "@types/react-datepicker": "^6.0.1",
     "@types/react-dom": "^18.2.19",
+    "@types/sockjs-client": "^1.5.4",
+    "@types/stompjs": "^2.3.9",
     "@types/three": "^0.169.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",

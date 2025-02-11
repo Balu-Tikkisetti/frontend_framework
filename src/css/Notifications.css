@@ -1,0 +1,182 @@
+/* src/css/Notifications.css */
+.notifications-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 0 15px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .notifications-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+  }
+  
+  .unread-count {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+  
+  .no-notifications {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+  }
+  
+  .notification-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease;
+  }
+  
+  .notification-card.unread {
+    background-color: #f0f4ff;
+    border-left: 4px solid #007bff;
+  }
+  
+  .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .notification-type {
+    font-weight: bold;
+    font-size: 0.9em;
+    color: #555;
+    text-transform: uppercase;
+  }
+  
+  .notification-timestamp {
+    font-size: 0.8em;
+    color: #888;
+  }
+  
+  .notification-body p {
+    margin: 0;
+    color: #555;
+    line-height: 1.4;
+  }
+  
+  .notification-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .btn {
+    padding: 6px 12px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .btn-success {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .btn-success:hover {
+    background-color: #218838;
+  }
+  
+  .btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  
+  .btn-danger:hover {
+    background-color: #c82333;
+  }
+  
+  .notifications-pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .notifications-pagination button {
+    padding: 8px 16px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .notifications-pagination button:hover {
+    background-color: #e9ecef;
+  }
+  
+  .notifications-pagination button:disabled {
+    background-color: #f1f3f5;
+    color: #aaa;
+    cursor: not-allowed;
+  }
+  
+  .error {
+    color: #d9534f;
+    text-align: center;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .notifications-container {
+      padding: 0 10px;
+    }
+  
+    .notification-card {
+      padding: 10px;
+    }
+  
+    .notifications-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .unread-count {
+      margin-top: 10px;
+    }
+  
+    .notification-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .notification-timestamp {
+      margin-top: 4px;
+    }
+  
+    .notification-actions {
+      flex-direction: column;
+    }
+  
+    .notification-actions .btn {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  }

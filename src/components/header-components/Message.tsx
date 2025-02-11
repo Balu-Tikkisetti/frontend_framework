@@ -1,139 +1,333 @@
-import { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
-import "bootstrap/dist/css/bootstrap.min.css"; 
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { ArrowLeft, Send, MoreVertical } from 'lucide-react';
+import "bootstrap/dist/css/bootstrap.min.css";
+import { useAuth } from '../../context/AuthContext';
+import { 
+  getMessageBuddies, 
+  getChatMessages, 
+  sendMessage, 
+  MessageBuddyDTO 
+} from '../../controller/MessageController';
+import "../../css/Message.css"
 
-interface User {
-  id: number;
-  name: string;
-  isOnline: boolean;
-  avatar: string;
-}
-
-interface Message {
-  id: number;
+interface ChatMessage {
+  id: string;
   text: string;
-  isSender: boolean;
+  senderId: number;
+  recipientId: number;
   timestamp: string;
+  status?: 'SENT' | 'DELIVERED' | 'READ';
 }
 
-const Message = () => {
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, text: "Hey, how are you?", isSender: false, timestamp: "10:00 AM" },
-    { id: 2, text: "I'm good, thanks! How about you?", isSender: true, timestamp: "10:02 AM" },
-    { id: 3, text: "Just working on some new features", isSender: false, timestamp: "10:05 AM" }
-  ]);
-  
-  const users: User[] = [
-    { id: 1, name: "Desirae Schleifer", isOnline: false, avatar: "/api/placeholder/40/40" },
-    { id: 2, name: "Jocelyn Dias", isOnline: true, avatar: "/api/placeholder/40/40" },
-    { id: 3, name: "Marilyn Franci", isOnline: true, avatar: "/api/placeholder/40/40" },
-    { id: 4, name: "Nolan Dorwart", isOnline: false, avatar: "/api/placeholder/40/40" },
-    { id: 5, name: "Kianna George", isOnline: false, avatar: "/api/placeholder/40/40" },
-    { id: 6, name: "Helena Thortnot", isOnline: true, avatar: "/api/placeholder/40/40" },
-    { id: 7, name: "Carla Westervelt", isOnline: false, avatar: "/api/placeholder/40/40" },
-    { id: 8, name: "Jaydon Torff", isOnline: true, avatar: "/api/placeholder/40/40" },
-    { id: 9, name: "Mira Curtis", isOnline: false, avatar: "/api/placeholder/40/40" },
-    { id: 10, name: "Chance Septimus", isOnline: true, avatar: "/api/placeholder/40/40" },
-    { id: 11, name: "Ashlynn Aminoff", isOnline: true, avatar: "/api/placeholder/40/40" }
-  ];
+const Message: React.FC = () => {
+  const { userId } = useAuth();
+  const [messageBuddies, setMessageBuddies] = useState<MessageBuddyDTO[]>([]);
+  const [selectedBuddy, setSelectedBuddy] = useState<MessageBuddyDTO | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [newMessage, setNewMessage] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const messageEndRef = useRef<HTMLDivElement>(null);
+  const messageContainerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch message buddies
+  useEffect(() => {
+    const fetchMessageBuddies = async () => {
+      if (!userId) return;
+      try {
+        setLoading(true);
+        const buddies = await getMessageBuddies(userId);
+        setMessageBuddies(buddies);
+      } catch (err) {
+        setError('Failed to load message buddies');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMessageBuddies();
+  }, [userId]);
+
+  // Fetch chat messages with infinite scroll
+  const fetchChatMessages = useCallback(async (lastMessageId?: string) => {
+    if (!userId || !selectedBuddy) return;
+    try {
+      setLoading(true);
+      const chatMessages = await getChatMessages(
+        userId, 
+        selectedBuddy.userId, 
+        lastMessageId
+      );
+
+      // Update messages and check if there are more
+      setMessages(prev => 
+        lastMessageId 
+          ? [...chatMessages, ...prev] 
+          : chatMessages
+      );
+      setHasMore(chatMessages.length === 50); // Assuming 50 is the limit
+    } catch (err) {
+      setError('Failed to load chat messages');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, selectedBuddy]);
+
+  // Initial chat messages load
+  useEffect(() => {
+    if (selectedBuddy) {
+      fetchChatMessages();
+    }
+  }, [selectedBuddy, fetchChatMessages]);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Send message handler
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !userId || !selectedBuddy) return;
+    try {
+      await sendMessage(userId, selectedBuddy.userId, newMessage.trim());
+      
+      const sentMessage: ChatMessage = {
+        id: `temp_${Date.now()}`,
+        text: newMessage.trim(),
+        senderId: userId,
+        recipientId: selectedBuddy.userId,
+        timestamp: new Date().toISOString(),
+        status: 'SENT'
+      };
+
+      setMessages(prev => [...prev, sentMessage]);
+      setNewMessage('');
+      
+      // Scroll to bottom
+      messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {
+      setError('Failed to send message');
+      console.error(err);
+    }
+  };
+
+  // Handle infinite scroll
+  const handleScroll = useCallback(() => {
+    const container = messageContainerRef.current;
+    if (!container || !hasMore) return;
+
+    if (container.scrollTop === 0) {
+      const oldestMessageId = messages[0]?.id;
+      fetchChatMessages(oldestMessageId);
+    }
+  }, [fetchChatMessages, hasMore, messages]);
+
+  // Render loading state
+  if (loading && (!selectedBuddy || messages.length === 0)) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Render error state
+  if (error) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100 text-danger">
+        {error}
+      </div>
+    );
+  }
 
   return (
-    <div className="h-full bg-white flex flex-col">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-800">Messages</h2>
-      </div>
-
-      {!selectedUser ? (
-        // User List
-        <div className="overflow-y-auto flex-1">
-          {users.map((user) => (
-            <div
-              key={user.id}
-              onClick={() => setSelectedUser(user)}
-              className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 cursor-pointer"
-            >
-              <div className="relative">
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                {user.isOnline && (
-                  <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></div>
-                )}
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xs font-medium text-gray-900">{user.name}</h3>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        // Chat Interface
-        <div className="flex flex-col h-full">
-          {/* Chat Header */}
-          <div className="p-4 border-b border-gray-200 flex items-center gap-3">
-            <button 
-              onClick={() => setSelectedUser(null)}
-              className="hover:bg-gray-100 p-1 rounded-full"
-            >
-              <ArrowLeft className="h-5 w-5 text-gray-600" />
+    <div className="container-fluid h-100">
+      <div className="row h-100">
+        {/* Sidebar */}
+        <div className="col-4 border-end h-100 d-flex flex-column">
+          <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
+            <h5 className="mb-0">Messages</h5>
+            <button className="btn btn-outline-secondary btn-sm">
+              <MoreVertical size={18} />
             </button>
-            <div className="relative">
-              <img
-                src={selectedUser.avatar}
-                alt={selectedUser.name}
-                className="w-8 h-8 rounded-full"
-              />
-              {selectedUser.isOnline && (
-                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></div>
-              )}
-            </div>
-            <span className="text-sm font-medium">{selectedUser.name}</span>
           </div>
 
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.isSender ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[75%] rounded-lg p-3 ${
-                    message.isSender 
-                      ? 'bg-blue-500 text-white' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
+          <div className="overflow-auto flex-grow-1">
+            {messageBuddies.length === 0 ? (
+              <div className="text-center text-muted p-4">
+                No message buddies found
+              </div>
+            ) : (
+              messageBuddies.map((buddy) => (
+                <BuddyListItem 
+                  key={buddy.userId} 
+                  buddy={buddy} 
+                  isSelected={selectedBuddy?.userId === buddy.userId}
+                  onSelect={() => setSelectedBuddy(buddy)}
+                />
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Chat Area */}
+        {selectedBuddy ? (
+          <div className="col-8 h-100 d-flex flex-column">
+            {/* Chat Header */}
+            <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center">
+                <button 
+                  className="btn btn-outline-secondary me-3 d-md-none"
+                  onClick={() => setSelectedBuddy(null)}
                 >
-                  <p className="text-sm">{message.text}</p>
-                  <span className={`text-xs ${message.isSender ? 'text-blue-100' : 'text-gray-500'}`}>
-                    {message.timestamp}
-                  </span>
+                  <ArrowLeft size={20} />
+                </button>
+                <div className="position-relative me-3">
+                  <img
+                    src={selectedBuddy.profilePicture}
+                    alt={selectedBuddy.username}
+                    className="rounded-circle"
+                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                  />
+                  {selectedBuddy.isOnline && (
+                    <span className="position-absolute bottom-0 end-0 p-1 bg-success rounded-circle border border-white"></span>
+                  )}
+                </div>
+                <div>
+                  <h6 className="mb-1">{selectedBuddy.username}</h6>
+                  <small className="text-muted">
+                    {selectedBuddy.isOnline ? 'Online' : 'Offline'}
+                  </small>
                 </div>
               </div>
-            ))}
-          </div>
-
-          {/* Message Input */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-blue-500"
-              />
-              <button className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600">
-                Send
+              <button className="btn btn-outline-secondary">
+                <MoreVertical size={20} />
               </button>
             </div>
+
+            {/* Messages Area */}
+            <div 
+              ref={messageContainerRef}
+              onScroll={handleScroll}
+              className="flex-grow-1 overflow-auto p-3 bg-light"
+            >
+              {loading && hasMore && (
+                <div className="text-center text-muted">Loading more...</div>
+              )}
+
+              {messages.map((msg) => (
+                <MessageItem 
+                  key={msg.id} 
+                  message={msg} 
+                  isCurrentUser={msg.senderId === userId} 
+                />
+              ))}
+              <div ref={messageEndRef} />
+            </div>
+
+            {/* Message Input */}
+            <div className="p-3 border-top bg-white">
+              <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Type a message..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                />
+                <button 
+                  className="btn btn-primary" 
+                  type="button"
+                  onClick={handleSendMessage}
+                  disabled={!newMessage.trim()}
+                >
+                  <Send size={20} />
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="col-8 d-flex justify-content-center align-items-center text-muted">
+            Select a conversation to start messaging
+          </div>
+        )}
+      </div>
     </div>
   );
 };
+
+// Buddy List Item Component
+const BuddyListItem: React.FC<{
+  buddy: MessageBuddyDTO;
+  isSelected: boolean;
+  onSelect: () => void;
+}> = ({ buddy, isSelected, onSelect }) => (
+  <div
+    onClick={onSelect}
+    className={`d-flex align-items-center p-3 border-bottom cursor-pointer ${isSelected ? 'bg-light' : 'hover-bg-light'}`}
+  >
+    <div className="position-relative me-3">
+      <img
+        src={buddy.profilePicture}
+        alt={buddy.username}
+        className="rounded-circle"
+        style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+      />
+      {buddy.isOnline && (
+        <span className="position-absolute bottom-0 end-0 p-1 bg-success rounded-circle border border-white"></span>
+      )}
+    </div>
+    <div className="flex-grow-1">
+      <div className="d-flex justify-content-between align-items-center">
+        <h6 className="mb-1">{buddy.username}</h6>
+        {buddy.unreadCount && buddy.unreadCount > 0 && (
+          <span className="badge bg-danger">{buddy.unreadCount}</span>
+        )}
+      </div>
+      {buddy.lastMessage && (
+        <p className="text-muted mb-0 text-truncate">
+          {buddy.lastMessage}
+        </p>
+      )}
+    </div>
+  </div>
+);
+
+// Message Item Component
+const MessageItem: React.FC<{
+  message: ChatMessage;
+  isCurrentUser: boolean;
+}> = ({ message, isCurrentUser }) => (
+  <div className={`d-flex mb-3 ${isCurrentUser ? 'justify-content-end' : 'justify-content-start'}`}>
+    <div 
+      className={`p-2 rounded ${
+        isCurrentUser 
+          ? 'bg-primary text-white' 
+          : 'bg-light text-dark'
+      }`}
+      style={{ maxWidth: '75%' }}
+    >
+      <p className="mb-1">{message.text}</p>
+      <small className={`d-block text-right ${isCurrentUser ? 'text-white-50' : 'text-muted'}`}>
+        {new Date(message.timestamp).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        })}
+      </small>
+      {isCurrentUser && message.status && (
+        <div className="small opacity-50 text-right">
+          {message.status === 'SENT' && '✓'}
+          {message.status === 'DELIVERED' && '✓✓'}
+          {message.status === 'READ' && '✓✓'}
+        </div>
+      )}
+    </div>
+  </div>
+);
 
 export default Message;

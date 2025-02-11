@@ -70,3 +70,17 @@ export const searchUserViewDetails = async (userId: number) => {
 };
 
 
+
+export const sendMessageRequest = async (senderId: number, recipientId: number) => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/message/message-request/${senderId}/sent/${recipientId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error sending message request:", error);
+    throw error;
+  }
+};
+
+
