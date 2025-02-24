@@ -10,6 +10,7 @@ import NotificationPost from "./components/Notifications.tsx";
 import PrivateRoute from "./context/PrivateRoute.tsx";
 import { AuthProvider } from "./context/AuthContext.tsx";
 import TopicsWorld from "./topicsWorld.tsx";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function Routers() {
   return (

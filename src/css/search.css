@@ -1,4 +1,5 @@
 /* Search.css */
+
 .search-container {
   width: 100%;
   position: relative;
@@ -12,11 +13,12 @@
   position: relative;
 }
 
+/* Updated Search Form: White background, subtle borders */
 .search-form {
   width: 100%;
   padding: 10px;
-  background-color: #1a1a1a;
-  border-bottom: 1px solid #444;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
 }
 
 .search-input-wrapper {
@@ -28,22 +30,22 @@
 .search-icon {
   position: absolute;
   left: 12px;
-  color: #666;
+  color: #999;
 }
 
 .search-input {
   width: 100%;
   padding: 10px 40px;
-  background-color: #222;
-  color: white;
-  border: 1px solid #666;
+  background-color: #ffffff;
+  color: #333;
+  border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 16px;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #28a745;
+  border-color: #0d6efd; /* Enterprise blue accent */
 }
 
 .clear-button {
@@ -51,68 +53,76 @@
   right: 12px;
   background: none;
   border: none;
-  color: #666;
+  color: #999;
   font-size: 20px;
   cursor: pointer;
   padding: 0 8px;
 }
 
 .clear-button:hover {
-  color: #999;
+  color: #666;
 }
 
-/* Dropdown Styles */
+/* Dropdown Styles: White background with subtle shadows */
 .search-dropdown {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
-  background-color: #1a1a1a;
-  border: 1px solid #444;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
   border-top: none;
   border-radius: 0 0 8px 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   max-height: 80vh;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc #ffffff;
 }
 
+.search-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.search-dropdown::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+.search-dropdown::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+/* Section Styles */
 .search-section {
   padding: 16px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #eee;
 }
 
-.search-tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.tag {
-  background-color: #333;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 14px;
+.search-section:last-child {
+  border-bottom: none;
 }
 
 .section-title {
-  color: #999;
+  color: #666;
   font-size: 14px;
   margin-bottom: 12px;
 }
 
+/* Result Item Styles */
 .result-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px;
+  padding: 12px;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
   margin-bottom: 4px;
 }
 
 .result-item:hover {
-  background-color: #333;
+  background-color: #f8f9fa;
 }
 
 .result-content {
@@ -129,8 +139,9 @@
 }
 
 .result-name {
-  color: white;
+  color: #333;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .result-meta {
@@ -144,27 +155,20 @@
   text-align: center;
 }
 
+/* Controls and Tabs */
 .search-controls {
   display: flex;
   gap: 16px;
   padding: 12px 16px;
-  border-top: 1px solid #333;
+  border-top: 1px solid #eee;
   color: #666;
   font-size: 12px;
 }
 
-/* Dark theme adjustments */
-.search-input::placeholder {
-  color: #666;
-}
-
-
-/* Add these to your existing Search.css file */
-
 .section-tabs {
   display: flex;
   padding: 12px 16px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #eee;
   gap: 8px;
 }
 
@@ -179,59 +183,16 @@
 }
 
 .section-tab:hover {
-  background-color: #333;
-  color: #fff;
+  background-color: #f0f0f0;
+  color: #333;
 }
 
 .section-tab.active {
-  background-color: #28a745;
-  color: white;
+  background-color: #0d6efd; /* Enterprise blue accent */
+  color: #fff;
 }
 
-.topic-icon {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #333;
-  border-radius: 8px;
-  font-size: 20px;
-}
-
-.result-content .topic-icon {
-  margin-right: 12px;
-}
-
-/* Adjust existing styles */
-.search-section {
-  padding: 16px;
-  border-bottom: 1px solid #333;
-}
-
-.search-section:last-child {
-  border-bottom: none;
-}
-
-.result-item {
-  transition: background-color 0.2s ease;
-}
-
-.result-item:hover {
-  background-color: #333;
-}
-
-
-/* Add these to your existing Search.css */
-
-.result-count {
-  background-color: rgba(255, 255, 255, 0.2);
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 12px;
-  margin-left: 6px;
-}
-
+/* Topic Styles */
 .topic-info {
   display: flex;
   flex-direction: column;
@@ -243,37 +204,23 @@
   color: #666;
 }
 
-.search-dropdown {
-  max-height: 80vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #666 #1a1a1a;
-}
-
-.search-dropdown::-webkit-scrollbar {
-  width: 6px;
-}
-
-.search-dropdown::-webkit-scrollbar-track {
-  background: #1a1a1a;
-}
-
-.search-dropdown::-webkit-scrollbar-thumb {
-  background-color: #666;
-  border-radius: 3px;
-}
-
-.result-item {
-  padding: 12px;
-}
-
 .topic-info .result-name {
   font-size: 14px;
   font-weight: 500;
-  color: #fff;
+  color: #333;
   line-height: 1.4;
 }
 
+/* Result Count Badge */
+.result-count {
+  background-color: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+/* Support Button */
 .result-actions {
   display: flex;
   align-items: center;
@@ -283,14 +230,14 @@
   padding: 6px 12px;
   border-radius: 4px;
   border: 1px solid #ccc;
-  background-color: white;
+  background-color: #ffffff;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .support-button.support {
   background-color: #4CAF50;
-  color: white;
+  color: #ffffff;
   border-color: #4CAF50;
 }
 
@@ -300,4 +247,9 @@
 
 .support-button.support:hover {
   background-color: #45a049;
+}
+
+/* Placeholder adjustments */
+.search-input::placeholder {
+  color: #999;
 }

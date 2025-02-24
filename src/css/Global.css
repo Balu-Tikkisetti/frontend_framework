@@ -1,20 +1,15 @@
+/* Global.css */
 
-
-*{
-    box-sizing: border-box;
+.global-page {
+    width: 100%;
+    max-width: 100%;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
   }
-
-.global-page{
-    width: 150vh;
-    height: 100vh;
-    
-background-color: blanchedalmond;
-}
-
-/* Fixed search bar at the top */
-.searchBar {
+  
+  /* Fixed search bar at the top */
+  .searchBar {
     position: sticky;
     top: 0;
     z-index: 10;
@@ -22,25 +17,13 @@ background-color: blanchedalmond;
     padding: 10px 0;
     margin-bottom: 10px;
   }
+  
+  /* You can style the topics container as needed */
+  .global-topics-container {
+    /* For example, add some padding */
+    padding: 1rem;
+    /* The overflow-scroll class (from Tailwind) will handle scrolling */
+  }
+  
 
-
-
-/* Tabs and medium screens */
-@media screen and (min-width: 1000px) and (max-width: 1400px) {
-    .global-page{
-        width: 100vh;
-    }
-}
-
-
-
-
-
-
-/* mobiles & small screens */
-
-@media screen and (max-width: 1000px) {
-    .global-page{
-        width: 60vh;
-    }
-}
+  

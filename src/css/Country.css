@@ -4,10 +4,11 @@
   padding: 0;
 }
 
+/* The country-page now fills 100% of its parent width */
 .country-page {
-  width: 150vh;
-  height: 100vh;
-  position: relative; /* Add this to establish positioning context */
+  width: 100%;
+  height: 100vh; /* You can change this to auto if you prefer */
+  position: relative; /* Establish positioning context if needed */
   display: flex;
   flex-direction: column;
 }
@@ -33,17 +34,20 @@
   padding-bottom: 20px; /* Add some bottom padding for last item */
 }
 
-/* Tabs and medium screens */
+/* If needed, adjust styles for different screen sizes */
+/* In this update, we remove the vh-based width values
+   and let the element remain at 100% width of its parent */
+
 @media screen and (min-width: 1000px) and (max-width: 1400px) {
   .country-page {
-    width: 100vh;
+    width: 100%;
+    /* Optionally, adjust padding or margins if needed */
   }
 }
 
-/* mobiles & small screens */
 @media screen and (max-width: 1000px) {
   .country-page {
-    width: 60vh;
+    width: 100%;
   }
   
   .country-topics-container {

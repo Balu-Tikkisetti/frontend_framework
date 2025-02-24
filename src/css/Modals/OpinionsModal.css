@@ -1,111 +1,110 @@
-/* Modal Styling */
-.opinions-modal {
-    background: rgba(0, 0, 0, 0.5); /* Dark background overlay */
+@import "tailwindcss";
+
+/* Custom animations */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
   }
-  
-  /* Topic Card */
-  .topic-card {
-    background: linear-gradient(135deg, #2b2b2b, #1a1a1a);
-    color: white;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    position: relative;
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
-  
-  /* Profile Section */
-  .profile-section {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
+}
+
+@keyframes modalFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
   }
-  
-  .topic-profile-pic,
-  .opinion-profile-pic {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
-    border: 2px solid #041479;
+  to {
+    opacity: 0;
+    transform: scale(0.95);
   }
-  
-  /* Topic Details */
-  .topic-text {
-    font-size: 1rem;
-    margin-bottom: 10px;
-  }
-  
-  /* Opinions Section */
-  .opinions-section {
-    margin-top: 20px;
-  }
-  
-  .opinion-item {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    background: #1a1a1a;
-    border-radius: 8px;
-    margin-bottom: 8px;
-  }
-  
-  .opinion-content {
-    flex: 1;
-  }
-  
-  .opinion-username {
-    font-weight: bold;
-    color: white;
+}
+
+/* Custom scrollbar styling */
+.opinions-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.opinions-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.opinions-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
+}
+
+.dark .opinions-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 85, 99, 0.5);
+}
+
+/* Modal animations */
+.modal-enter {
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+.modal-exit {
+  animation: modalFadeOut 0.2s ease-in;
+}
+
+/* Custom focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-blue-400 dark:focus:ring-offset-gray-900;
+}
+
+/* Custom placeholder styles */
+.input-placeholder::placeholder {
+  @apply text-gray-400 dark:text-gray-500;
+}
+
+/* Image loading skeleton */
+.image-skeleton {
+  @apply animate-pulse bg-gray-200 dark:bg-gray-700;
+}
+
+/* Opinion item hover effect */
+.opinion-item-hover {
+  @apply transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-750;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .modal-content {
+    @apply mx-4;
   }
   
   .opinion-text {
-    margin: 5px 0;
-    color: #ccc;
+    @apply text-sm;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .modal-enter,
+  .modal-exit {
+    animation: none;
   }
   
-  /* Highlight the Opinions icon */
-  .opinion-active {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .opinions-modal {
+    @apply bg-white text-black;
   }
   
-  /* Opinion Input Container */
+  .modal-header,
   .opinion-input-container {
-    display: flex;
-    align-items: center;
-    background: #1a1a1a;
-    border: 2px solid skyblue;
-    border-radius: 8px;
-    padding: 10px;
-    margin: 10px;
+    display: none;
   }
   
-  /* Opinion Input Field */
-  .opinion-input {
-    flex-grow: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: white;
-    font-size: 1rem;
+  .opinions-section {
+    @apply border-none shadow-none;
   }
-  
-  .opinion-input::placeholder {
-    color: #bbb;
-  }
-  
-  /* Send Opinion Button */
-  .send-opinion-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: skyblue;
-    font-size: 1.5rem;
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .send-opinion-btn:hover {
-    transform: scale(1.2);
-  }
-  
+}

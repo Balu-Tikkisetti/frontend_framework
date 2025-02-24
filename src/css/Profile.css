@@ -1,234 +1,61 @@
-/* Global Reset */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
-  /* Container */
-  .profile-page {
-    width: 200vh;
-    height: 100vh;
-    display: flex;
-    flex-direction: row;
-    overflow: hidden;
-    background-color: #f0f0f2;
-    margin-bottom: 10px;
-    margin-top: 10px;
-  }
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css");
 
-  .row{
-    width: 110%;
-    height: 100%;
-  }
-  
+/* 
+  The .profile-page container ensures that your profile content 
+  occupies the full available width of the main content area.
+*/
+.profile-page {
+  width: 100%;
+  padding: 20px;  /* Adjust padding as needed */
+  margin: 0 auto;
+}
 
-  
+/* Flag icons styling */
+.flag-icon {
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  display: inline-block;
+}
 
-  
-  .profile-section {
-    text-align: center;
-  }
-  
-  .profile-pic {
-    width: 200px;
-    height: 200px;
-   
-    object-fit: cover;
-  }
-  
-  .username {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-top: 10px;
-  }
-  
-  
+/* Social icons styling */
+.social-icon {
+  font-size: 1.5rem;
+  color: #4a5568;
+  transition: color 0.2s ease-in-out;
+}
 
-  .sidebar{
-   margin-bottom: 10px;
-  }
+.social-icon:hover {
+  color: #2d3748;
+}
 
-  
-  .sidebar-item {
-    padding: 0.8rem 1.2rem;
-    background: linear-gradient(to right, #4364F7, #6FB1FC);
-    border-radius: 8px;
-    text-align: center;
-    flex: 1;
-    width: 300px;
-    max-width: 250px;
-    transition: all 0.3s ease;
-    line-height: 100px;
-    margin-bottom: 10px;
-    color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .sidebar-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(to right, #3557E5, #5AA0F7);
-  }
+/* Create topic button hover effect */
+.create-topic-button {
+  transition: transform 0.2s ease-in-out;
+}
 
-  .sidebar-item button {
-    background: transparent;
-    border: none;
-    color: white;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-  }
-  
-  .sidebar-item button:hover {
-    background: transparent;
-    color: white;
-  }
-  
-  /* Main Content */
-  .content {
-    flex-grow: 1;
-    padding: 20px;
-    overflow-y: auto;
-    width: max-content;
-   
-  }
+.create-topic-button:hover {
+  transform: scale(1.1);
+}
 
-  .content-container{
-    width: 100%;
-    height: 100%;
-  }
-  
-  /* Toggle Buttons */
-  .profile-toggle-buttons {
-    display: flex;
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-  
-  .profile-toggle-buttons button {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-    background-color: transparent;
-    transition: background 0.2s ease-in-out;
-  }
-  
-  .profile-toggle-buttons .btn-secondary {
-    background: #9dbfe4;
-    color: white;
-  }
-  
-  .profile-toggle-buttons .btn-outline-secondary {
-    background: white;
-    color: black;
-    border: 1px solid #eceef1;
-  }
-  
-  .profile-toggle-buttons .btn-outline-secondary:hover {
-    background: #bfd4eb;
-    color: white;
-  }
-  
-  /* Topics Section */
-  .profile-topics-section {
-    flex: 1;
-    overflow-y: auto;
-  }
-  
-  .topics-list h3 {
-    font-size: 1.3rem;
-    font-weight: bold;
-  }
-  
-  .topic-item {
-    padding: 1rem;
-    background: #f9f9f9;
-    margin-bottom: 0.5rem;
-    border-radius: 8px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .topic-item h4 {
-    font-size: 1.2rem;
-    font-weight: bold;
-  }
-  
-  .topic-item p {
-    font-size: 1rem;
-    color: #555;
-  }
-  
-  /* Create Topic Section */
-  .topic-create textarea {
-    width: 100%;
-    height: 80px;
-    padding: 0.5rem;
-    font-size: 1rem;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    resize: none;
-  }
-  
-  .topic-create input[type="file"] {
-    margin-top: 10px;
-  }
-  
-  .topic-create button {
-    display: inline-block;
-    margin-top: 1rem;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    width: 100%;
-  }
-  
-  .topic-create button:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Photo Preview Section */
-  .photo-preview img {
-    display: block;
-    max-width: 100%;
-    max-height: 200px;
-    height: auto;
-    margin: 10px auto;
-    border-radius: 8px;
-  }
-  
-  /* Scrollable Section */
-  .scrollable-view {
-    overflow-y: auto;
-    max-height: calc(100vh - 200px);
-  }
+/* Topic card styling with hover effects */
+.topic-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
 
+.topic-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
- 
-  
-  
+/* Button hover transition within topic card */
+.topic-card button {
+  transition: color 0.2s ease-in-out;
+}
 
-  /* Responsive */
+.topic-card button:hover {
+  color: #4a5568;
+}
 
-  @media screen and (max-width: 800px) {
-    .profile-page{
-        width: 65vh;
-    }
-
-    .sidebar-links {
-        display: flex;
-        gap: 50px; /* Space between items */
-        align-items: center; /* Vertical alignment */
-        margin-bottom: 10px;
-      }
-    .profile-pic{
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-  }
+/* Add any additional custom styles here */

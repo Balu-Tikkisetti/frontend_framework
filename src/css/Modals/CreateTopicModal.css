@@ -1,0 +1,55 @@
+/* CreateTopicModal.css */
+
+.create-topic-modal .modal-content {
+    border-radius: 15px;
+  }
+  
+  .create-topic-modal .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: none;
+  }
+  
+  .create-topic-modal .modal-title {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .create-topic-modal .modal-body {
+    padding: 20px;
+  }
+  
+  .create-topic-modal .form-label {
+    font-weight: 600;
+    color: #555;
+  }
+  
+  .topic-text-input {
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+  
+  .topic-text-input:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+  
+  .topic-photo-input {
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 10px;
+  }
+  
+  .create-topic-modal .modal-footer {
+    border-top: none;
+  }
+  
+  .create-topic-modal .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .create-topic-modal .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }

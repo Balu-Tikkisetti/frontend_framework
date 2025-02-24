@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 .topics-list {
     max-height: 60vh; /* Adjust based on layout */
     overflow-y: auto; /* Enables vertical scrolling */

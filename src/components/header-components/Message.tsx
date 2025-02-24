@@ -1,35 +1,26 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Send, MoreVertical } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MoreVertical, Search, Lock } from 'lucide-react';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useAuth } from '../../context/AuthContext';
 import { 
   getMessageBuddies, 
-  getChatMessages, 
-  sendMessage, 
   MessageBuddyDTO 
 } from '../../controller/MessageController';
-import "../../css/Message.css"
+import "../../css/Message.css";
+import profilePic from "../../assets/unisex-profile-pic.png";
 
-interface ChatMessage {
-  id: string;
-  text: string;
-  senderId: number;
-  recipientId: number;
-  timestamp: string;
-  status?: 'SENT' | 'DELIVERED' | 'READ';
+interface MessageProps {
+  onBuddySelect: (buddy: MessageBuddyDTO) => void;
 }
 
-const Message: React.FC = () => {
+const Message: React.FC<MessageProps> = ({ onBuddySelect }) => {
   const { userId } = useAuth();
   const [messageBuddies, setMessageBuddies] = useState<MessageBuddyDTO[]>([]);
-  const [selectedBuddy, setSelectedBuddy] = useState<MessageBuddyDTO | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState<string>('');
+  const [privateBuddies, setPrivateBuddies] = useState<MessageBuddyDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const messageEndRef = useRef<HTMLDivElement>(null);
-  const messageContainerRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<'General' | 'Private'>('General');
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   // Fetch message buddies
   useEffect(() => {
@@ -39,6 +30,14 @@ const Message: React.FC = () => {
         setLoading(true);
         const buddies = await getMessageBuddies(userId);
         setMessageBuddies(buddies);
+        
+        // Placeholder for future private buddies
+        // This could be fetched from a different API or filtered differently
+        const mockPrivateBuddies = buddies.slice(0, 2).map(buddy => ({
+          ...buddy,
+          isPrivate: true
+        }));
+        setPrivateBuddies(mockPrivateBuddies);
       } catch (err) {
         setError('Failed to load message buddies');
         console.error(err);
@@ -49,83 +48,14 @@ const Message: React.FC = () => {
     fetchMessageBuddies();
   }, [userId]);
 
-  // Fetch chat messages with infinite scroll
-  const fetchChatMessages = useCallback(async (lastMessageId?: string) => {
-    if (!userId || !selectedBuddy) return;
-    try {
-      setLoading(true);
-      const chatMessages = await getChatMessages(
-        userId, 
-        selectedBuddy.userId, 
-        lastMessageId
-      );
-
-      // Update messages and check if there are more
-      setMessages(prev => 
-        lastMessageId 
-          ? [...chatMessages, ...prev] 
-          : chatMessages
-      );
-      setHasMore(chatMessages.length === 50); // Assuming 50 is the limit
-    } catch (err) {
-      setError('Failed to load chat messages');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, [userId, selectedBuddy]);
-
-  // Initial chat messages load
-  useEffect(() => {
-    if (selectedBuddy) {
-      fetchChatMessages();
-    }
-  }, [selectedBuddy, fetchChatMessages]);
-
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // Send message handler
-  const handleSendMessage = async () => {
-    if (!newMessage.trim() || !userId || !selectedBuddy) return;
-    try {
-      await sendMessage(userId, selectedBuddy.userId, newMessage.trim());
-      
-      const sentMessage: ChatMessage = {
-        id: `temp_${Date.now()}`,
-        text: newMessage.trim(),
-        senderId: userId,
-        recipientId: selectedBuddy.userId,
-        timestamp: new Date().toISOString(),
-        status: 'SENT'
-      };
-
-      setMessages(prev => [...prev, sentMessage]);
-      setNewMessage('');
-      
-      // Scroll to bottom
-      messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    } catch (err) {
-      setError('Failed to send message');
-      console.error(err);
-    }
-  };
-
-  // Handle infinite scroll
-  const handleScroll = useCallback(() => {
-    const container = messageContainerRef.current;
-    if (!container || !hasMore) return;
-
-    if (container.scrollTop === 0) {
-      const oldestMessageId = messages[0]?.id;
-      fetchChatMessages(oldestMessageId);
-    }
-  }, [fetchChatMessages, hasMore, messages]);
+  // Filter buddies based on search term and active tab
+  const filteredBuddies = (activeTab === 'General' ? messageBuddies : privateBuddies)
+    .filter(buddy => 
+      buddy.username.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   // Render loading state
-  if (loading && (!selectedBuddy || messages.length === 0)) {
+  if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center vh-100">
         <div className="spinner-border text-primary" role="status">
@@ -145,117 +75,66 @@ const Message: React.FC = () => {
   }
 
   return (
-    <div className="container-fluid h-100">
-      <div className="row h-100">
-        {/* Sidebar */}
-        <div className="col-4 border-end h-100 d-flex flex-column">
-          <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
-            <h5 className="mb-0">Messages</h5>
-            <button className="btn btn-outline-secondary btn-sm">
-              <MoreVertical size={18} />
+    <div className="message-container">
+      <div className="message-sidebar">
+        <div className="message-sidebar-header">
+          <div className="flex w-full justify-between items-center">
+            <button 
+              className={`flex-1 text-sm font-semibold pb-2 text-center ${activeTab === 'General' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'}`}
+              onClick={() => setActiveTab('General')}
+            >
+              General <span className="ml-1 bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 text-xs">{messageBuddies.length}</span>
             </button>
-          </div>
-
-          <div className="overflow-auto flex-grow-1">
-            {messageBuddies.length === 0 ? (
-              <div className="text-center text-muted p-4">
-                No message buddies found
+            <button 
+              className={`flex-1 text-sm font-semibold pb-2 text-center ${activeTab === 'Private' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'}`}
+              onClick={() => setActiveTab('Private')}
+            >
+              <div className="flex items-center justify-center">
+                <Lock size={14} className="mr-1" />
+                Private <span className="ml-1 bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 text-xs">{privateBuddies.length}</span>
               </div>
-            ) : (
-              messageBuddies.map((buddy) => (
-                <BuddyListItem 
-                  key={buddy.userId} 
-                  buddy={buddy} 
-                  isSelected={selectedBuddy?.userId === buddy.userId}
-                  onSelect={() => setSelectedBuddy(buddy)}
-                />
-              ))
-            )}
+            </button>
+            <button className="text-gray-500 hover:text-gray-700">
+              <MoreVertical size={20} />
+            </button>
           </div>
         </div>
 
-        {/* Chat Area */}
-        {selectedBuddy ? (
-          <div className="col-8 h-100 d-flex flex-column">
-            {/* Chat Header */}
-            <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
-              <div className="d-flex align-items-center">
-                <button 
-                  className="btn btn-outline-secondary me-3 d-md-none"
-                  onClick={() => setSelectedBuddy(null)}
-                >
-                  <ArrowLeft size={20} />
-                </button>
-                <div className="position-relative me-3">
-                  <img
-                    src={selectedBuddy.profilePicture}
-                    alt={selectedBuddy.username}
-                    className="rounded-circle"
-                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                  />
-                  {selectedBuddy.isOnline && (
-                    <span className="position-absolute bottom-0 end-0 p-1 bg-success rounded-circle border border-white"></span>
-                  )}
-                </div>
-                <div>
-                  <h6 className="mb-1">{selectedBuddy.username}</h6>
-                  <small className="text-muted">
-                    {selectedBuddy.isOnline ? 'Online' : 'Offline'}
-                  </small>
-                </div>
-              </div>
-              <button className="btn btn-outline-secondary">
-                <MoreVertical size={20} />
-              </button>
-            </div>
-
-            {/* Messages Area */}
-            <div 
-              ref={messageContainerRef}
-              onScroll={handleScroll}
-              className="flex-grow-1 overflow-auto p-3 bg-light"
-            >
-              {loading && hasMore && (
-                <div className="text-center text-muted">Loading more...</div>
-              )}
-
-              {messages.map((msg) => (
-                <MessageItem 
-                  key={msg.id} 
-                  message={msg} 
-                  isCurrentUser={msg.senderId === userId} 
-                />
-              ))}
-              <div ref={messageEndRef} />
-            </div>
-
-            {/* Message Input */}
-            <div className="p-3 border-top bg-white">
-              <div className="input-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Type a message..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                />
-                <button 
-                  className="btn btn-primary" 
-                  type="button"
-                  onClick={handleSendMessage}
-                  disabled={!newMessage.trim()}
-                >
-                  <Send size={20} />
-                </button>
-              </div>
+        {/* Search Input */}
+        <div className="px-4 py-3">
+          <div className="relative">
+            <input 
+              type="text" 
+              placeholder="Search chat" 
+              className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <Search size={20} className="text-gray-400" />
             </div>
           </div>
-        ) : (
-          <div className="col-8 d-flex justify-content-center align-items-center text-muted">
-            Select a conversation to start messaging
-          </div>
-        )}
+        </div>
+
+        {/* Buddy List */}
+        <div className="message-buddy-list">
+          {filteredBuddies.length === 0 ? (
+            <div className="text-center text-gray-500 p-4">
+              {activeTab === 'General' 
+                ? 'No message buddies found' 
+                : 'No private chats available'}
+            </div>
+          ) : (
+            filteredBuddies.map((buddy) => (
+              <BuddyListItem 
+                key={buddy.userId} 
+                buddy={buddy}
+                onSelect={onBuddySelect}
+                isPrivate={activeTab === 'Private'}
+              />
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
@@ -264,68 +143,43 @@ const Message: React.FC = () => {
 // Buddy List Item Component
 const BuddyListItem: React.FC<{
   buddy: MessageBuddyDTO;
-  isSelected: boolean;
-  onSelect: () => void;
-}> = ({ buddy, isSelected, onSelect }) => (
-  <div
-    onClick={onSelect}
-    className={`d-flex align-items-center p-3 border-bottom cursor-pointer ${isSelected ? 'bg-light' : 'hover-bg-light'}`}
+  onSelect: (buddy: MessageBuddyDTO) => void;
+  isPrivate?: boolean;
+}> = ({ buddy, onSelect, isPrivate = false }) => (
+  <div 
+    className="message-buddy-item group"
+    onClick={() => onSelect(buddy)}
   >
-    <div className="position-relative me-3">
+    <div className="message-buddy-avatar">
       <img
-        src={buddy.profilePicture}
-        alt={buddy.username}
-        className="rounded-circle"
-        style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+        src={profilePic}
+        alt=""
       />
-      {buddy.isOnline && (
-        <span className="position-absolute bottom-0 end-0 p-1 bg-success rounded-circle border border-white"></span>
-      )}
+      {buddy.isOnline && <div className="online-indicator" />}
     </div>
-    <div className="flex-grow-1">
-      <div className="d-flex justify-content-between align-items-center">
-        <h6 className="mb-1">{buddy.username}</h6>
-        {buddy.unreadCount && buddy.unreadCount > 0 && (
-          <span className="badge bg-danger">{buddy.unreadCount}</span>
+    <div className="flex-grow">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          <span className="font-semibold">{buddy.username}</span>
+          {isPrivate && (
+            <Lock 
+              size={12} 
+              className="ml-2 text-gray-500 group-hover:text-primary" 
+            />
+          )}
+        </div>
+        <span className="text-xs text-gray-500">
+          {new Date(buddy.lastMessageTimestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </span>
+      </div>
+      <div className="flex justify-between items-center mt-1">
+        <p className="text-sm text-gray-500 truncate flex-grow">
+          {buddy.isTyping ? `${buddy.username} is typing...` : buddy.lastMessage}
+        </p>
+        {buddy.unreadCount > 0 && (
+          <span className="unread-badge">{buddy.unreadCount}</span>
         )}
       </div>
-      {buddy.lastMessage && (
-        <p className="text-muted mb-0 text-truncate">
-          {buddy.lastMessage}
-        </p>
-      )}
-    </div>
-  </div>
-);
-
-// Message Item Component
-const MessageItem: React.FC<{
-  message: ChatMessage;
-  isCurrentUser: boolean;
-}> = ({ message, isCurrentUser }) => (
-  <div className={`d-flex mb-3 ${isCurrentUser ? 'justify-content-end' : 'justify-content-start'}`}>
-    <div 
-      className={`p-2 rounded ${
-        isCurrentUser 
-          ? 'bg-primary text-white' 
-          : 'bg-light text-dark'
-      }`}
-      style={{ maxWidth: '75%' }}
-    >
-      <p className="mb-1">{message.text}</p>
-      <small className={`d-block text-right ${isCurrentUser ? 'text-white-50' : 'text-muted'}`}>
-        {new Date(message.timestamp).toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit'
-        })}
-      </small>
-      {isCurrentUser && message.status && (
-        <div className="small opacity-50 text-right">
-          {message.status === 'SENT' && '✓'}
-          {message.status === 'DELIVERED' && '✓✓'}
-          {message.status === 'READ' && '✓✓'}
-        </div>
-      )}
     </div>
   </div>
 );

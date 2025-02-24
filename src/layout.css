@@ -1,100 +1,73 @@
-/* 🌟 General Layout */
-.layout-container {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #87CEFA, #00BFFF) !important;
-    position: relative;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
+/* src/layout.css */
+@import "tailwindcss";
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Custom scrollbar styles */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Custom transition for sidebars */
+.sidebar-transition {
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Custom background gradient */
+.bg-gradient-custom {
+  background: linear-gradient(135deg, #ffffff, #f0f0f0);
+}
+
+/* Custom shadow for depth */
+.custom-shadow {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .sidebar-transition {
+    width: 75%;
+    max-width: 300px;
   }
-  
-  /* 🌟 Mobile Action Buttons */
-  .mobile-action-button {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    padding: 12px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+}
+
+/* Desktop styles */
+@media (min-width: 768px) {
+  .md\:w-1\/4 {
+    width: 25%;
   }
-  
-  .mobile-action-button:hover {
-    transform: scale(1.1);
+  .md\:w-1\/2 {
+    width: 50%;
   }
-  
-  /* 🌟 Sidebar (Left & Right Panels) */
-  .sidebar {
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    overflow-y: auto;
-    transition: all 0.3s ease-in-out;
-  }
-  
-  /* ✅ Responsive Sidebar */
-  @media (max-width: 768px) {
-    .sidebar {
-      position: fixed;
-      width: 250px;
-      height: 100vh;
-      z-index: 50;
-      transform: translateX(-100%);
-    }
-  
-    .sidebar.d-block {
-      transform: translateX(0);
-    }
-  }
-  
-  /* 🌟 Main Container */
-  .main-container {
-    flex: 1;
-    min-height: 100vh;
-    padding-top: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  /* 🌟 Navigation Bar */
-  .navigation-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 12px 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    z-index: 30;
-    text-align: center;
-  }
-  
-  /* 🌟 Scrollbar Customization */
-  .layout-container::-webkit-scrollbar,
-  .sidebar::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .layout-container::-webkit-scrollbar-track,
-  .sidebar::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-  }
-  
-  .layout-container::-webkit-scrollbar-thumb,
-  .sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-  }
-  
-  .sidebar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.4);
-  }
-  
-  /* ✅ Responsive Fixes */
-  @media (max-width: 768px) {
-    .main-container {
-      padding-top: 60px;
-    }
-  }
-  
+}
+
+
+
+.bg-sky-500 {
+  background-color: #0ea5e9; /* This is a sky blue variant */
+}

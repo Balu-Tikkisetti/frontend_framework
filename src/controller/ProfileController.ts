@@ -23,9 +23,11 @@ export const fetchProfileData = async (userId: number): Promise<UserProfile> => 
     return new UserProfile(
       data.username || "Anonymous",
       data.gmail || "N/A",
-      data.gender || "N/A",
+      data.password || "N/A",
       data.dob || "N/A",
-      data.profilePicture || profilePic, // Fallback to default
+      data.gender || "N/A",
+      data.profilePicture || profilePic,
+      data.phoneNumber || "N/A",
       data.supportersCount || 0,
       data.supportedCount || 0
     );

@@ -2,7 +2,7 @@
 const Details = () => {
     return (
       <div className="p-4 text-white">
-        <h2 className="text-xl font-bold mb-4">Topic Details</h2>
+      
         <div className="space-y-4">
           <div className="bg-gray-800/50 rounded-lg p-4">
             <h3 className="font-medium mb-2">Statistics</h3>
