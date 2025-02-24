@@ -62,7 +62,7 @@ const Chat: React.FC<ChatProps> = ({ buddy, userId, onClose }) => {
       const destination = `/app/chat/${userId}-${buddy.id}`;
       ChatSocketService.sendMessage(destination, messagePayload);
 
-      // Now the types match exactly
+    
       setMessages(prev => [...prev, messagePayload]);
       setNewMessage("");
     }
