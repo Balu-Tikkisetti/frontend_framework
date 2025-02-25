@@ -25,7 +25,7 @@ const Details: React.FC = () => {
 
         {/* Category Panel */}
         <div className="bg-gradient-to-br from-gray-700 to-gray-900 rounded-xl p-6 shadow-lg transform transition duration-300 hover:scale-105">
-          <h3 className="text-lg font-semibold mb-4 border-b border-gray-600 pb-2">Category</h3>
+          <h3 className="text-lg font-semibold mb-4 border-b border-gray-600 pb-2">Count</h3>
           <div className="flex flex-wrap gap-3">
             <span className="bg-blue-600/20 text-blue-200 px-3 py-1 rounded-full text-sm font-medium shadow-sm transition-colors hover:bg-blue-600 hover:text-white">
               Technology
