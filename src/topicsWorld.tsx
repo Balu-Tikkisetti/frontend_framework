@@ -10,7 +10,7 @@ import Community from "./components/Community";
 import TrendingTopics from "./components/TrendingTopics";
 import Notifications from "./components/Notifications";
 import Profile from "./components/Profile";
-import NavigationBar from "./components/Navigator";
+import NavigationBar from "./components/Navigator"
 import Message from "./components/header-components/Message";
 import Details from "./components/header-components/Details";
 import Chat from "./components/Chat";
