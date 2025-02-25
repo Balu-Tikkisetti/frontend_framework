@@ -10,6 +10,8 @@ import { useAuth } from '../context/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
 import '../css/Notifications.css';
 
+const ITEMS_PER_PAGE = 10;
+
 interface Notification {
   id: number;
   type: "MESSAGE_REQUEST" | "UPVOTE" | "OPINION" | "OTHERS";
@@ -19,9 +21,9 @@ interface Notification {
   status: "READ" | "UNREAD";
   timestamp: string;
   referenceId?: number;
+  // Additional properties with better typing
+  [key: string]: unknown;
 }
-
-const ITEMS_PER_PAGE = 10;
 
 const Notifications: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -49,12 +51,12 @@ const Notifications: React.FC = () => {
   }, [loading, hasMore]);
 
   // Fetch notifications with pagination
-  const loadNotifications = async (pageNum: number) => {
+  const loadNotifications = useCallback(async (pageNum: number) => {
     if (!userId || !hasMore) return;
 
     try {
       setLoading(true);
-      const newNotifications = await fetchNotifications(userId, pageNum);
+      const newNotifications = await fetchNotifications(userId, pageNum) as Notification[];
       
       setNotifications(prev => {
         if (pageNum === 0) return newNotifications;
@@ -65,7 +67,7 @@ const Notifications: React.FC = () => {
 
       // Only fetch unread count on initial load
       if (pageNum === 0) {
-        const count = await getUnreadNotificationsCount(userId);
+        const count = await getUnreadNotificationsCount(userId) as number;
         setUnreadCount(count);
       }
     } catch (err) {
@@ -74,12 +76,12 @@ const Notifications: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId, hasMore]);
 
   // Initial load and pagination
   useEffect(() => {
-    loadNotifications(page);
-  }, [userId, page]);
+    void loadNotifications(page);
+  }, [userId, page, loadNotifications]);
 
   // WebSocket connection
   useEffect(() => {
@@ -118,6 +120,15 @@ const Notifications: React.FC = () => {
     } catch (err) {
       console.error('Failed to respond to message request', err);
     }
+  };
+
+  // Wrapper functions for event handlers that don't return promises
+  const handleAccept = (notification: Notification) => {
+    void handleResponse(notification, true);
+  };
+
+  const handleDecline = (notification: Notification) => {
+    void handleResponse(notification, false);
   };
 
   const formatTimestamp = (timestamp: string): string => {
@@ -173,13 +184,13 @@ const Notifications: React.FC = () => {
                     <div className="notification-actions">
                       <button
                         className="btn-accept"
-                        onClick={() => handleResponse(notification, true)}
+                        onClick={() => handleAccept(notification)}
                       >
                         Accept
                       </button>
                       <button
                         className="btn-decline"
-                        onClick={() => handleResponse(notification, false)}
+                        onClick={() => handleDecline(notification)}
                       >
                         Decline
                       </button>

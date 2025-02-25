@@ -4,13 +4,6 @@ import "../css/Chat.css";
 import profilePic from "../assets/unisex-profile-pic.png";
 import ChatSocketService from "../services/ChatSocketService";
 
-export interface ChatMessage {
-  id: string;
-  sender: string;
-  content: string;
-  timestamp: Date;
-  type?: "text" | "system";
-}
 
 interface ChatProps {
   buddy: {
@@ -22,6 +15,15 @@ interface ChatProps {
   userId: number;
   onClose: () => void;
 }
+interface ChatMessage {
+  id: string;
+  sender: string;
+  content: string;
+  timestamp: Date | string; // Allow both Date objects and strings
+  type?: "text" | "system";
+  // Include index signature to allow additional properties
+  [key: string]: unknown;
+}
 
 const Chat: React.FC<ChatProps> = ({ buddy, userId, onClose }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -31,7 +33,7 @@ const Chat: React.FC<ChatProps> = ({ buddy, userId, onClose }) => {
 
   useEffect(() => {
     if (buddy) {
-      ChatSocketService.connect(userId, Number(buddy.id), (incomingMsg: any) => {
+      ChatSocketService.connect(userId, Number(buddy.id), (incomingMsg) => {
         const parsedMessage: ChatMessage = {
           ...incomingMsg,
           timestamp: new Date(incomingMsg.timestamp),
@@ -49,9 +51,9 @@ const Chat: React.FC<ChatProps> = ({ buddy, userId, onClose }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (newMessage.trim() && buddy) {
-      const messagePayload: ChatMessage = {  // Explicitly type the payload
+      const messagePayload: ChatMessage = {
         id: Date.now().toString(),
         sender: "You",
         content: newMessage,
@@ -60,9 +62,8 @@ const Chat: React.FC<ChatProps> = ({ buddy, userId, onClose }) => {
       };
 
       const destination = `/app/chat/${userId}-${buddy.id}`;
-      ChatSocketService.sendMessage(destination, messagePayload);
+      void ChatSocketService.sendMessage(destination, messagePayload);
 
-    
       setMessages(prev => [...prev, messagePayload]);
       setNewMessage("");
     }
@@ -148,10 +149,17 @@ const Chat: React.FC<ChatProps> = ({ buddy, userId, onClose }) => {
                   message.sender === "You" ? "sent-timestamp" : "received-timestamp"
                 }`}
               >
-                {message.timestamp.toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {/* Handle both Date objects and strings */}
+                {typeof message.timestamp === 'string' 
+                  ? new Date(message.timestamp).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : message.timestamp.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                }
               </div>
             </div>
           </div>

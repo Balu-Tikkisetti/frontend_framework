@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import { X, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 interface Topic {
   id: string;
@@ -29,7 +29,7 @@ const EditTopicModal: React.FC<EditTopicModalProps> = ({ show, topic, onClose, o
   const [updatedText, setUpdatedText] = useState<string>(topic.text);
   const [updatedLocation, setUpdatedLocation] = useState<string>(topic.location);
   const [newImage, setNewImage] = useState<File | null>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string>(topic.topicImageUrl || '');
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string>(topic.topicImageUrl ?? '');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
@@ -40,15 +40,15 @@ const EditTopicModal: React.FC<EditTopicModalProps> = ({ show, topic, onClose, o
       setUpdatedText(topic.text);
       setUpdatedLocation(topic.location);
       setNewImage(null);
-      setImagePreviewUrl(topic.topicImageUrl || '');
+      setImagePreviewUrl(topic.topicImageUrl ?? '');
       setError('');
     }
   }, [topic, show]);
 
   // Handle image file selection and preview update.
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+    const file = e.target.files?.[0];
+    if (file) {
       setNewImage(file);
       const previewUrl = URL.createObjectURL(file);
       setImagePreviewUrl(previewUrl);
@@ -88,6 +88,11 @@ const EditTopicModal: React.FC<EditTopicModalProps> = ({ show, topic, onClose, o
     }
   };
 
+  // Wrapper for handleSubmit that doesn't return a promise
+  const onSubmitForm = (e: FormEvent<HTMLFormElement>) => {
+    void handleSubmit(e);
+  };
+
   if (!show) return null;
 
   return (
@@ -95,7 +100,7 @@ const EditTopicModal: React.FC<EditTopicModalProps> = ({ show, topic, onClose, o
       <Modal.Header closeButton>
         <Modal.Title>Edit Topic</Modal.Title>
       </Modal.Header>
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={onSubmitForm}>
         <Modal.Body>
           {error && (
             <div className="alert alert-danger" role="alert">

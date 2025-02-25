@@ -6,7 +6,7 @@ import { api } from "./model/constants";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import { Check, X } from "lucide-react";
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 interface SignupProps {
   onClose: () => void;
@@ -18,6 +18,12 @@ interface FormData {
   dob: Date | null;
   password: string;
   gender: string;
+}
+
+interface SignupResponse {
+  id: number;
+  accessToken: string;
+  // Add other expected response fields here
 }
 
 type InputChangeEvent = ChangeEvent<HTMLInputElement | HTMLSelectElement>;
@@ -77,44 +83,41 @@ const Signup: React.FC<SignupProps> = ({ onClose }) => {
   };
 
   const handleSubmit = async (e: FormSubmitEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!validRequirements.every(Boolean)) {
-    setPasswordError("Please meet all password requirements.");
-    return;
-  }
-  setPasswordError("");
-
-  try {
-    const submissionData = new FormData();
-    submissionData.append("username", formData.username);
-    submissionData.append("gmail", formData.gmail);
-    submissionData.append("password", formData.password);
-    // Ensure the date format matches what your backend expects.
-    // If the backend expects "MM-dd-yyyy", you may need to reformat.
-    // For now, we're sending "yyyy-MM-dd" from toISOString().split("T")[0]
-    submissionData.append("dob", formData.dob ? formData.dob.toISOString().split("T")[0] : "");
-    submissionData.append("gender", formData.gender);
-
-    const response = await axios.post(api + "/signup", submissionData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      withCredentials: true,
-    });
-
-    const data = response.data;
-    await fetchUser({ userId: data.id, accessToken: data.accessToken });
-    navigate("/topicsWorld");
-  } catch (err: any) {
-    // Log detailed error info for debugging.
-    if (err.response) {
-      console.error("Error response data:", err.response.data);
+    if (!validRequirements.every(Boolean)) {
+      setPasswordError("Please meet all password requirements.");
+      return;
     }
-    console.error("Error occurred during signup:", err);
-    setError(err instanceof Error ? err.message : "An unexpected error occurred");
-  }
-};
+    setPasswordError("");
 
-  
+    try {
+      const submissionData = new FormData();
+      submissionData.append("username", formData.username);
+      submissionData.append("gmail", formData.gmail);
+      submissionData.append("password", formData.password);
+
+      submissionData.append("dob", formData.dob ? formData.dob.toISOString().split("T")[0] : "");
+      submissionData.append("gender", formData.gender);
+
+      const response: AxiosResponse<SignupResponse> = await axios.post(api + "/signup", submissionData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
+
+      const data = response.data;
+      await fetchUser({ userId: data.id, accessToken: data.accessToken });
+      navigate("/topicsWorld");
+    } catch (err) {
+      // Log detailed error info for debugging.
+      const axiosError = err as AxiosError;
+      if (axiosError.response) {
+        console.error("Error response data:", axiosError.response.data);
+      }
+      console.error("Error occurred during signup:", err);
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+    }
+  };
 
   return (
     <div className="container-fluid vh-100 d-flex align-items-center justify-content-center signup-overlay">

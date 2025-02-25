@@ -12,14 +12,13 @@ import {
   hasUserUpvoted,
 } from "../controller/UpvoteController";
 import { formatTimestamp } from "../utils/formatTimestamp";
-import { X } from "lucide-react";
 import OpinionsModal from "./OpinionsModal";
 import ImageModal from "./ImageModal";
 
 const Community: React.FC = () => {
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [upvotes, setUpvotes] = useState<{ [topicId: string]: number }>({});
-  const [userUpvotes, setUserUpvotes] = useState<{ [topicId: string]: boolean }>({});
+  const [upvotes, setUpvotes] = useState<Record<string, number>>({});
+  const [userUpvotes, setUserUpvotes] = useState<Record<string, boolean>>({});
   const [showImageModal, setShowImageModal] = useState<boolean>(false);
   const [modalImageUrl, setModalImageUrl] = useState<string>("");
   const [isOpinionsModalOpen, setIsOpinionsModalOpen] = useState(false);
@@ -27,20 +26,7 @@ const Community: React.FC = () => {
   
   const { userId, location } = useAuth();
 
-  useEffect(() => {
-    if (!userId || !location) return;
-    const loadTopics = async () => {
-      try {
-        const fetchedTopics = await fetchCommunityTopics(userId, location);
-        setTopics(fetchedTopics);
-        await fetchUpvotes(fetchedTopics);
-      } catch (error) {
-        console.error("Error loading community topics:", error);
-      }
-    };
-    loadTopics();
-  }, [userId, location]);
-
+  // Define fetchUpvotes outside useEffect to use as a dependency
   const fetchUpvotes = async (topics: Topic[]) => {
     if (!userId) return;
     try {
@@ -67,12 +53,26 @@ const Community: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (!userId || !location) return;
+    const loadTopics = async () => {
+      try {
+        const fetchedTopics = await fetchCommunityTopics(userId, location);
+        setTopics(fetchedTopics);
+        void fetchUpvotes(fetchedTopics);
+      } catch (error) {
+        console.error("Error loading community topics:", error);
+      }
+    };
+    void loadTopics();
+  }, [userId, location, fetchUpvotes]);
+
   const toggleUpvote = async (topicId: string) => {
     if (!userId) return;
-    const currentUpvoted = userUpvotes[topicId] || false;
+    const currentUpvoted = userUpvotes[topicId] ?? false;
     const newUpvotes = {
       ...upvotes,
-      [topicId]: (upvotes[topicId] || 0) + (currentUpvoted ? -1 : 1),
+      [topicId]: (upvotes[topicId] ?? 0) + (currentUpvoted ? -1 : 1),
     };
     const newUserUpvotes = { ...userUpvotes, [topicId]: !currentUpvoted };
     setUpvotes(newUpvotes);
@@ -88,6 +88,11 @@ const Community: React.FC = () => {
       setUpvotes(upvotes);
       setUserUpvotes(userUpvotes);
     }
+  };
+
+  // Wrapper for toggleUpvote that doesn't return a promise
+  const handleToggleUpvote = (topicId: string) => {
+    void toggleUpvote(topicId);
   };
 
   const handleImageClick = (topicImageUrl: string) => {
@@ -114,7 +119,7 @@ const Community: React.FC = () => {
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center">
                       <img
-                        src={topic.profilePicture || profilePic}
+                        src={topic.profilePicture ?? profilePic}
                         alt={topic.username}
                         className="w-10 h-10 rounded-full mr-2"
                       />
@@ -139,7 +144,8 @@ const Community: React.FC = () => {
                         style={{ maxHeight: "300px" }}
                         onClick={() => {
                           if(!topic.topicImageUrl) return;
-                          handleImageClick(topic.topicImageUrl)}}
+                          handleImageClick(topic.topicImageUrl);
+                        }}
                       />
                     </div>
                   )}
@@ -159,10 +165,10 @@ const Community: React.FC = () => {
                           ? "text-blue-500"
                           : "text-gray-300 hover:text-white"
                       }`}
-                      onClick={() => toggleUpvote(topic.id.toString())}
+                      onClick={() => handleToggleUpvote(topic.id.toString())}
                     >
                       <i className="bi bi-rocket text-xl"></i>
-                      <span className="ml-4">{upvotes[topic.id.toString()] || 0}</span>
+                      <span className="ml-4">{upvotes[topic.id.toString()] ?? 0}</span>
                     </button>
                   </div>
                   <div className="mt-2 text-gray-400 text-xs">
@@ -181,9 +187,9 @@ const Community: React.FC = () => {
           onClose={() => setIsOpinionsModalOpen(false)}
           topicText={selectedTopicForOpinions.text}
           topicId={selectedTopicForOpinions.id.toString()}
-          topicImage={selectedTopicForOpinions.topicImageUrl || null}
+          topicImage={selectedTopicForOpinions.topicImageUrl ?? null}
           username={selectedTopicForOpinions.username}
-          userProfilePic={selectedTopicForOpinions.profilePicture || profilePic}
+          userProfilePic={selectedTopicForOpinions.profilePicture ?? profilePic}
           location={selectedTopicForOpinions.location}
           timestamp={selectedTopicForOpinions.timestamp}
         />
@@ -200,4 +206,4 @@ const Community: React.FC = () => {
   );
 };
 
-export default Community
+export default Community;

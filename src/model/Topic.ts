@@ -1,5 +1,5 @@
 class Topic {
-  id: String;
+  id: string;
   userId: number | null; 
   username: string; 
   profilePicture: string | null; 
@@ -10,13 +10,13 @@ class Topic {
   topicImageUrl: string | null; 
 
   constructor(
-    id: String,
+    id: string,
     annotate:string,
     text: string,
     location: string,
     timestamp: string,
     userId: number | null = null, 
-    username: string = "Unknown", 
+    username: string, 
     profilePicture: string | null = null, 
     topicImageUrl: string | null = null 
   ) {

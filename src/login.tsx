@@ -1,11 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import { useState } from "react";
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import "./App.css";
 
 interface LoginProps {
   onSignupClick: () => void;
+}
+
+// Define response type for better type safety
+interface LoginResponse {
+  id: number;
+  accessToken: string;
+  // Add other response properties as needed
 }
 
 const Login: React.FC<LoginProps> = ({ onSignupClick }) => {
@@ -27,7 +34,8 @@ const Login: React.FC<LoginProps> = ({ onSignupClick }) => {
     formData.append("password", target.password.value);
 
     try {
-      const response = await axios.post(
+      // Properly type the response
+      const response: AxiosResponse<LoginResponse> = await axios.post(
         "http://localhost:8080/api/login",
         formData,
         {
@@ -38,6 +46,7 @@ const Login: React.FC<LoginProps> = ({ onSignupClick }) => {
         }
       );
 
+      // No more unsafe member access with typed response
       await fetchUser({
         userId: response.data.id,
         accessToken: response.data.accessToken,
@@ -45,10 +54,17 @@ const Login: React.FC<LoginProps> = ({ onSignupClick }) => {
       navigate("/topicsWorld");
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
+      // Using nullish coalescing operator as recommended
       setError(
-        error.response?.data?.message || "Login failed. Please try again."
+        error.response?.data?.message ?? "Login failed. Please try again."
       );
     }
+  };
+
+  // For the form onSubmit warning, create a non-async wrapper function
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    // Void the promise to avoid the "Promise-returning function" warning
+    void handleLoginSubmit(e);
   };
 
   return (
@@ -65,7 +81,7 @@ const Login: React.FC<LoginProps> = ({ onSignupClick }) => {
             </div>
           )}
 
-          <form onSubmit={handleLoginSubmit}>
+          <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label htmlFor="username" className="form-label">
                 Username

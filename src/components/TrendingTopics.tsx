@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Search from "./header-components/Search";
 import { useAuth } from "../context/AuthContext";
 
-import { fetchTrendingTopics, fetchUserTopics } from "../controller/TopicController";
+import { fetchTrendingTopics } from "../controller/TopicController";
 import { 
   addUpvote, 
   removeUpvote, 
@@ -17,30 +17,17 @@ import Topic from "../model/Topic";
 
 const TrendingTopics: React.FC = () => {
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [upvotes, setUpvotes] = useState<{ [topicId: string]: number }>({});
-  const [userUpvotes, setUserUpvotes] = useState<{ [topicId: string]: boolean }>({});
+  const [upvotes, setUpvotes] = useState<Record<string, number>>({});
+  const [userUpvotes, setUserUpvotes] = useState<Record<string, boolean>>({});
   const [showImageModal, setShowImageModal] = useState<boolean>(false);
   const [modalImageUrl, setModalImageUrl] = useState<string>("");
   const [isOpinionsModalOpen, setIsOpinionsModalOpen] = useState<boolean>(false);
   const [selectedTopicForOpinions, setSelectedTopicForOpinions] = useState<Topic | null>(null);
   const [selectedTopics, setSelectedTopics] = useState<Topic[]>([]);
 
-  const { userId,location } = useAuth();
+  const { userId, location } = useAuth();
 
-  useEffect(() => {
-    if (!userId || !location) return;
-    const loadTopics = async () => {
-      try {
-        const fetchedGlobalTopics = await fetchTrendingTopics(userId,location);
-        setTopics(fetchedGlobalTopics);
-        await fetchUpvotes(fetchedGlobalTopics);
-      } catch (error) {
-        console.error("Error loading topics:", error);
-      }
-    };
-    loadTopics();
-  }, [userId]);
-
+  // Function to fetch upvotes - defined outside useEffect to be in the dependency array
   const fetchUpvotes = async (topics: Topic[]) => {
     if (!userId) return;
     try {
@@ -67,12 +54,33 @@ const TrendingTopics: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (!userId || !location) return;
+    const loadTopics = async () => {
+      try {
+        const fetchedGlobalTopics = await fetchTrendingTopics(userId, location);
+        setTopics(fetchedGlobalTopics);
+        
+        // Select first 3 topics for featured display
+        setSelectedTopics(fetchedGlobalTopics.slice(0, 3));
+        
+        // Use void operator for the Promise
+        void fetchUpvotes(fetchedGlobalTopics);
+      } catch (error) {
+        console.error("Error loading topics:", error);
+      }
+    };
+    
+    // Use void operator for the Promise
+    void loadTopics();
+  }, [userId, location, fetchUpvotes]);
+
   const toggleUpvote = async (topicId: string) => {
     if (!userId) return;
-    const currentUpvoted = userUpvotes[topicId] || false;
+    const currentUpvoted = userUpvotes[topicId] ?? false;
     const newUpvotes = {
       ...upvotes,
-      [topicId]: (upvotes[topicId] || 0) + (currentUpvoted ? -1 : 1),
+      [topicId]: (upvotes[topicId] ?? 0) + (currentUpvoted ? -1 : 1),
     };
     const newUserUpvotes = { ...userUpvotes, [topicId]: !currentUpvoted };
 
@@ -106,6 +114,11 @@ const TrendingTopics: React.FC = () => {
     setIsOpinionsModalOpen(true);
   };
 
+  // Wrapper for toggleUpvote that doesn't return a promise
+  const handleToggleUpvote = (topicId: string) => {
+    void toggleUpvote(topicId);
+  };
+
   return (
     <div className="w-full min-h-screen bg-white">
       <Search />
@@ -120,7 +133,7 @@ const TrendingTopics: React.FC = () => {
               {/* Background Image */}
               <div className="absolute inset-0">
                 <img 
-                  src={topic.topicImageUrl || topic.profilePicture || profilePic}
+                  src={topic.topicImageUrl ?? topic.profilePicture ?? profilePic}
                   alt={topic.username}
                   className="w-full h-full object-cover"
                 />
@@ -137,7 +150,7 @@ const TrendingTopics: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900/80 flex flex-col justify-end p-4">
                 <div className="flex items-center mb-2">
                   <img
-                    src={topic.profilePicture || profilePic}
+                    src={topic.profilePicture ?? profilePic}
                     alt={topic.username}
                     className="w-8 h-8 rounded-full mr-2"
                   />
@@ -165,11 +178,11 @@ const TrendingTopics: React.FC = () => {
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      toggleUpvote(topic.id.toString());
+                      handleToggleUpvote(topic.id.toString());
                     }}
                   >
                     <i className="bi bi-rocket text-lg"></i>
-                    <span className="ml-1">{upvotes[topic.id.toString()] || 0}</span>
+                    <span className="ml-1">{upvotes[topic.id.toString()] ?? 0}</span>
                   </button>
                 </div>
               </div>
@@ -189,7 +202,7 @@ const TrendingTopics: React.FC = () => {
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
                   <img
-                    src={topic.profilePicture || profilePic}
+                    src={topic.profilePicture ?? profilePic}
                     alt={topic.username}
                     className="w-10 h-10 rounded-full mr-2"
                   />
@@ -234,10 +247,10 @@ const TrendingTopics: React.FC = () => {
                       ? "text-blue-500"
                       : "text-gray-300 hover:text-white"
                   }`}
-                  onClick={() => toggleUpvote(topic.id.toString())}
+                  onClick={() => handleToggleUpvote(topic.id.toString())}
                 >
                   <i className="bi bi-rocket text-xl"></i>
-                  <span className="ml-4">{upvotes[topic.id.toString()] || 0}</span>
+                  <span className="ml-4">{upvotes[topic.id.toString()] ?? 0}</span>
                 </button>
               </div>
               <div className="mt-2 text-gray-400 text-xs">
@@ -255,9 +268,9 @@ const TrendingTopics: React.FC = () => {
           onClose={() => setIsOpinionsModalOpen(false)}
           topicText={selectedTopicForOpinions.text}
           topicId={selectedTopicForOpinions.id.toString()}
-          topicImage={selectedTopicForOpinions.topicImageUrl || null}
+          topicImage={selectedTopicForOpinions.topicImageUrl ?? null}
           username={selectedTopicForOpinions.username}
-          userProfilePic={selectedTopicForOpinions.profilePicture || profilePic}
+          userProfilePic={selectedTopicForOpinions.profilePicture ?? profilePic}
           location={selectedTopicForOpinions.location}
           timestamp={selectedTopicForOpinions.timestamp}
         />

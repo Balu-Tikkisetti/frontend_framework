@@ -1,7 +1,33 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import Topic from "../model/Topic";
 
 const API_BASE_URL = "http://localhost:8080/api"; // Update with your actual deployment URL
+
+// Define the API response type
+interface TopicData {
+  id: string;
+  annotate: string;
+  text: string;
+  location: string;
+  timestamp: string;
+  userId: number | null;
+  username: string;
+  profilePicture: string | null;
+  topicImageUrl: string | null;
+}
+
+// API response type for creating a topic
+interface CreateTopicResponse {
+  id: string;
+  annotate: string;
+  text: string;
+  location: string;
+  timestamp: string;
+  userId: number | null;
+  username: string;
+  profilePicture: string | null;
+  topicImageUrl: string | null;
+}
 
 /**
  * Fetch topics created by the user.
@@ -10,7 +36,7 @@ export const fetchUserTopics = async (userId: number): Promise<Topic[]> => {
   try {
     if (!userId) throw new Error("User not authenticated");
 
-    const response = await axios.get(`${API_BASE_URL}/topics/fetchtopics`, {
+    const response: AxiosResponse<TopicData[]> = await axios.get(`${API_BASE_URL}/topics/fetchtopics`, {
       params: { userId },
     });
 
@@ -19,7 +45,7 @@ export const fetchUserTopics = async (userId: number): Promise<Topic[]> => {
       return [];
     }
 
-    return response.data.map((topic: any) => new Topic(
+    return response.data.map((topic: TopicData) => new Topic(
       topic.id,                // id
       topic.annotate,          // annotate
       topic.text,              // text
@@ -42,8 +68,9 @@ export const fetchUserTopics = async (userId: number): Promise<Topic[]> => {
 export const fetchGlobalTopics = async (userId: number, location: string): Promise<Topic[]> => {
   try {
     if (!userId) throw new Error("User not authenticated");
-    let currentLocation=location;
-    const response = await axios.get(`${API_BASE_URL}/topics/getGlobalTopicsByUserId`, {
+    const currentLocation = location;
+    
+    const response: AxiosResponse<TopicData[]> = await axios.get(`${API_BASE_URL}/topics/getGlobalTopicsByUserId`, {
       params: { userId, currentLocation },
     });
 
@@ -52,7 +79,7 @@ export const fetchGlobalTopics = async (userId: number, location: string): Promi
       return [];
     }
 
-    return response.data.map((topic: any) => new Topic(
+    return response.data.map((topic: TopicData) => new Topic(
       topic.id,
       topic.annotate,
       topic.text,
@@ -75,8 +102,9 @@ export const fetchGlobalTopics = async (userId: number, location: string): Promi
 export const fetchCountryTopics = async (userId: number, location: string): Promise<Topic[]> => {
   try {
     if (!userId) throw new Error("User not authenticated");
-    let currentLocation=location;
-    const response = await axios.get(`${API_BASE_URL}/topics/getCountryTopicsByUserId`, {
+    const currentLocation = location;
+    
+    const response: AxiosResponse<TopicData[]> = await axios.get(`${API_BASE_URL}/topics/getCountryTopicsByUserId`, {
       params: { userId, currentLocation },
     });
 
@@ -85,7 +113,7 @@ export const fetchCountryTopics = async (userId: number, location: string): Prom
       return [];
     }
 
-    return response.data.map((topic: any) => new Topic(
+    return response.data.map((topic: TopicData) => new Topic(
       topic.id,
       topic.annotate,
       topic.text,
@@ -108,8 +136,9 @@ export const fetchCountryTopics = async (userId: number, location: string): Prom
 export const fetchCommunityTopics = async (userId: number, location: string): Promise<Topic[]> => {
   try {
     if (!userId) throw new Error("User not authenticated");
-    let currentLocation=location;
-    const response = await axios.get(`${API_BASE_URL}/topics/getCommunityTopicsByUserId`, {
+    const currentLocation = location;
+    
+    const response: AxiosResponse<TopicData[]> = await axios.get(`${API_BASE_URL}/topics/getCommunityTopicsByUserId`, {
       params: { userId, currentLocation },
     });
 
@@ -118,7 +147,7 @@ export const fetchCommunityTopics = async (userId: number, location: string): Pr
       return [];
     }
 
-    return response.data.map((topic: any) => new Topic(
+    return response.data.map((topic: TopicData) => new Topic(
       topic.id,
       topic.annotate,
       topic.text,
@@ -141,8 +170,9 @@ export const fetchCommunityTopics = async (userId: number, location: string): Pr
 export const fetchTrendingTopics = async (userId: number, location: string): Promise<Topic[]> => {
   try {
     if (!userId) throw new Error("User not authenticated");
-    let currentLocation=location;
-    const response = await axios.get(`${API_BASE_URL}/topics/getTrendingTopicsByUserId`, {
+    const currentLocation = location;
+    
+    const response: AxiosResponse<TopicData[]> = await axios.get(`${API_BASE_URL}/topics/getTrendingTopicsByUserId`, {
       params: { userId, currentLocation },
     });
 
@@ -151,7 +181,7 @@ export const fetchTrendingTopics = async (userId: number, location: string): Pro
       return [];
     }
 
-    return response.data.map((topic: any) => new Topic(
+    return response.data.map((topic: TopicData) => new Topic(
       topic.id,
       topic.annotate,
       topic.text,
@@ -188,12 +218,25 @@ export const createNewTopic = async (
     formData.append("location", location);
     if (topicImage) formData.append("topicImage", topicImage);
 
-    const response = await axios.post(`${API_BASE_URL}/topics/create`, formData, {
+    const response: AxiosResponse<CreateTopicResponse> = await axios.post(`${API_BASE_URL}/topics/create`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    console.log("Topic created successfully:", response.data);
-    return response.data;
+    if (response.data) {
+      console.log("Topic created successfully:", response.data);
+      return new Topic(
+        response.data.id,
+        response.data.annotate,
+        response.data.text,
+        response.data.location,
+        response.data.timestamp,
+        response.data.userId,
+        response.data.username,
+        response.data.profilePicture,
+        response.data.topicImageUrl
+      );
+    }
+    return null;
   } catch (error) {
     console.error("Error creating topic:", error);
     return null;

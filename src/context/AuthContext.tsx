@@ -17,6 +17,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const API_BASE_URL = "http://localhost:8080/api";
 
+// Define interface for nominatim API response
+interface NominatimAddress {
+  city?: string;
+  town?: string;
+  village?: string;
+  state?: string;
+  country?: string;
+}
+
+interface NominatimResponse {
+  address?: NominatimAddress;
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Authentication state
   const [userId, setUserId] = useState<number | null>(null);
@@ -34,16 +47,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    */
   const fetchCurrentLocationDetails = async (lat: number, lon: number): Promise<void> => {
     try {
-      const response = await axios.get(
+      const response = await axios.get<NominatimResponse>(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
       );
-      if (response.data && response.data.address) {
-        const city = response.data.address.city ||
-                     response.data.address.town ||
-                     response.data.address.village ||
+      
+      if (response.data?.address) {
+        const city = response.data.address.city ??
+                     response.data.address.town ??
+                     response.data.address.village ??
                      "Unknown";
-        const state = response.data.address.state || "Unknown";
-        const country = response.data.address.country || "Unknown";
+        const state = response.data.address.state ?? "Unknown";
+        const country = response.data.address.country ?? "Unknown";
         // Store the combined location details
         setLocation(`${city}, ${state}, ${country}`);
       }
@@ -63,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       navigator.geolocation.getCurrentPosition(
         (position) => {
           console.log("✅ Retrieved position:", position);
-          fetchCurrentLocationDetails(position.coords.latitude, position.coords.longitude);
+          void fetchCurrentLocationDetails(position.coords.latitude, position.coords.longitude);
         },
         (error) => {
           console.error("Error retrieving location:", error);
@@ -82,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    */
   useEffect(() => {
     if (location && !sessionChecked) {
-      fetchUser();
+      void fetchUser();
     }
   }, [location, sessionChecked]);
 
@@ -91,17 +105,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    * If user data is provided (e.g., during login/signup), store it;
    * otherwise, attempt to restore a session via the refresh-token endpoint.
    */
+  interface SessionResponse {
+    userId: number;
+    accessToken: string;
+  }
+
   const fetchUser = async (userData?: { userId: number; accessToken?: string }): Promise<void> => {
     try {
       if (userData) {
         setUserId(userData.userId);
-        setAccessToken(userData.accessToken || null);
+        setAccessToken(userData.accessToken ?? null);
         setIsAuthenticated(true);
         setSessionChecked(true);
       } else {
         console.log("🔄 Attempting session restore...");
-        const response = await apiClient.post(`${API_BASE_URL}/refresh-token`, {}, { withCredentials: true });
-        if (response.data.userId && response.data.accessToken) {
+        const response = await apiClient.post<SessionResponse>(`${API_BASE_URL}/refresh-token`, {}, { withCredentials: true });
+        if (response.data?.userId && response.data?.accessToken) {
           setUserId(response.data.userId);
           setAccessToken(response.data.accessToken);
           setIsAuthenticated(true);
@@ -135,13 +154,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Tailwind CSS–based responsive loading indicator while waiting for location
   if (!location) {
-
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-gray-700 text-xl font-semibold">Loading your location...</p>
       </div>
     );
- 
   }
 
   // Provide the AuthContext value to all children components.

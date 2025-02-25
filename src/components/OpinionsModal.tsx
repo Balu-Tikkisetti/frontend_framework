@@ -24,6 +24,12 @@ export interface OpinionsModalProps {
   timestamp: string;
 }
 
+// Define error type for better error handling
+interface ApiError {
+  message?: string;
+  [key: string]: unknown;
+}
+
 // Utility: Format a timestamp into relative time (e.g., "5 mins ago", "3 hrs ago", or formatted date)
 const formatRelativeTime = (timestamp: string): string => {
   const time = new Date(timestamp);
@@ -63,15 +69,16 @@ const OpinionsModal: React.FC<OpinionsModalProps> = ({
       const loadOpinions = async () => {
         setIsLoading(true);
         try {
-          const fetchedOpinions = await fetchOpinions(topicId);
+          const fetchedOpinions = await fetchOpinions(topicId) as Opinion[];
           setOpinions(fetchedOpinions);
-        } catch (error: any) {
-          console.error("Error fetching opinions:", error.message || error);
+        } catch (error: unknown) {
+          const apiError = error as ApiError;
+          console.error("Error fetching opinions:", apiError.message ?? "Unknown error");
         } finally {
           setIsLoading(false);
         }
       };
-      loadOpinions();
+      void loadOpinions();
     }
   }, [show, topicId]);
 
@@ -86,16 +93,22 @@ const OpinionsModal: React.FC<OpinionsModalProps> = ({
       await addOpinion(userId, topicId, newOpinion);
       const newOp: Opinion = {
         username,
-        userProfilePic: userProfilePic || null,
+        userProfilePic: userProfilePic ?? null,
         opinionText: newOpinion,
         timestamp: new Date().toISOString(),
       };
       setOpinions(prev => [newOp, ...prev]);
       setNewOpinion("");
-    } catch (error: any) {
-      console.error("Error adding opinion:", error.message || error);
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      console.error("Error adding opinion:", apiError.message ?? "Unknown error");
       alert("Failed to add opinion. Please try again.");
     }
+  };
+
+  // Wrapper function that doesn't return a promise
+  const handleSubmitClick = () => {
+    void handleOpinionSubmit();
   };
 
   if (!show) return null;
@@ -174,7 +187,7 @@ const OpinionsModal: React.FC<OpinionsModalProps> = ({
                 className="flex-1 min-w-0 px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 input-placeholder"
               />
               <button
-                onClick={handleOpinionSubmit}
+                onClick={handleSubmitClick}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
               >
                 <Send className="w-4 h-4" />

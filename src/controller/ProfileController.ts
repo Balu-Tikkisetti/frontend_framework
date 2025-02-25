@@ -1,22 +1,33 @@
 // src/controller/ProfileController.ts
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import UserProfile from "../model/Userprofile"; // Ensure correct import
 import profilePic from "../assets/dummy.png";
-import { useAuth } from "../context/AuthContext";
+// Remove unused import
+// import { useAuth } from "../context/AuthContext";
 
 const API_BASE_URL = "http://localhost:8080/api"; // Change this for deployment
 
-
-
+// Define the API response interface
+interface ProfileResponse {
+  username: string;
+  gmail: string;
+  password: string;
+  dob: string;
+  gender: string;
+  profilePicture: string | null;
+  phoneNumber: string;
+  supportersCount: number;
+  supportedCount: number;
+}
 
 export const fetchProfileData = async (userId: number): Promise<UserProfile> => {
   try {
     if (!userId) throw new Error("User ID is missing");
 
-    const response = await axios.get(`${API_BASE_URL}/profile`, {
-        params: { userId }, // ✅ Send as query parameter
-       
-      });
+    const response: AxiosResponse<ProfileResponse> = await axios.get(`${API_BASE_URL}/profile`, {
+      params: { userId }, // ✅ Send as query parameter
+    });
+    
     const data = response.data;
     
     // Map API response to UserProfile model
@@ -37,14 +48,12 @@ export const fetchProfileData = async (userId: number): Promise<UserProfile> => 
   }
 };
 
-
 export const deleteUser = async (userId: number): Promise<void> => {
   try {
     if (!userId) throw new Error("User ID is missing");
 
     const response = await axios.delete(`${API_BASE_URL}/deleteuser`, {
       params: { userId }, // ✅ Send userId as query parameter
-    
     });
 
     if (response.status === 200) {
@@ -57,7 +66,3 @@ export const deleteUser = async (userId: number): Promise<void> => {
     throw error;
   }
 };
-
-
-
-

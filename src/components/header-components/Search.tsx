@@ -4,7 +4,7 @@ import profilePic from "../../assets/unisex-profile-pic.png";
 import { searchUsers, searchTopics, updateSupported, deleteSupport, searchUserViewDetails } from "../../controller/SearchController";
 import "../../css/Search.css";
 import { useAuth } from "../../context/AuthContext";
-import SearchUserViewModal from "../SearchUserViewModal";
+import SearchUserViewModal, { UserProfile } from "../SearchUserViewModal";
 
 // Update interfaces to include isSupported flag
 interface Topic {
@@ -23,12 +23,16 @@ interface User {
   isSupported: boolean;
 }
 
+
+// Type for section tabs
+type SectionType = 'all' | 'users' | 'topics';
+
 const Search: React.FC = () => {
   const [query, setQuery] = useState("");
   const [userResults, setUserResults] = useState<User[]>([]);
   const [topicResults, setTopicResults] = useState<Topic[]>([]);
-  const [activeSection, setActiveSection] = useState<'all' | 'users' | 'topics'>('all');
-  const [userModalData, setUserModalData] = useState<any>(null);
+  const [activeSection, setActiveSection] = useState<SectionType>('all');
+  const [userModalData, setUserModalData] = useState<UserProfile | null>(null);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -45,26 +49,24 @@ const Search: React.FC = () => {
     }
 
     try {
-
       if(!userId){
         return alert("unauthorised");
       }
       // Search users
-      const userSearchResults = await searchUsers(searchQuery,userId);
-      setUserResults(userSearchResults);
+      const userSearchResults = await searchUsers(searchQuery, userId);
+      setUserResults(userSearchResults as User[]);
     } catch (error) {
       console.error("❌ Error searching users:", error);
       setUserResults([]);
     }
 
     try {
-
       if(!userId){
         return alert("unauthorised");
       }
       // Search topics
-      const topicSearchResults = await searchTopics(searchQuery,userId);
-      setTopicResults(topicSearchResults);
+      const topicSearchResults = await searchTopics(searchQuery, userId);
+      setTopicResults(topicSearchResults as Topic[]);
     } catch (error) {
       console.error("❌ Error searching topics:", error);
       setTopicResults([]);
@@ -86,7 +88,7 @@ const Search: React.FC = () => {
       }
   
       if (success) {
-        setUserResults((prevUsers: any[]) =>
+        setUserResults((prevUsers: User[]) =>
           prevUsers.map((user) =>
             user.id === supportedUserId ? { ...user, isSupported: !currentStatus } : user
           )
@@ -121,16 +123,25 @@ const Search: React.FC = () => {
     return activeSection === 'all' || activeSection === sectionName;
   };
 
-
   const openUserSearchView = async (selectedUserId: number) => {
     try {
       if (!userId) return alert("Unauthorized");
       const userDetails = await searchUserViewDetails(selectedUserId);
-      setUserModalData(userDetails);
+      setUserModalData(userDetails as UserProfile);
       setIsUserModalOpen(true);
     } catch (error) {
       console.error("Error opening user view details:", error);
     }
+  };
+
+  // Handler function that doesn't return a Promise
+  const handleUserClick = (userId: number) => {
+    void openUserSearchView(userId);
+  };
+
+  // Handler function for support button click
+  const handleSupportButtonClick = (userId: number, isSupported: boolean) => {
+    void handleSupportClick(userId, isSupported);
   };
 
   return (
@@ -165,7 +176,7 @@ const Search: React.FC = () => {
                 <button
                   key={section.id}
                   className={`section-tab ${activeSection === section.id ? 'active' : ''}`}
-                  onClick={() => setActiveSection(section.id as 'all' | 'users' | 'topics')}
+                  onClick={() => setActiveSection(section.id as SectionType)}
                 >
                   {section.label}
                   {section.id === 'users' && userResults.length > 0 && 
@@ -181,11 +192,14 @@ const Search: React.FC = () => {
               <div className="search-section">
                 <h3 className="section-title">Users</h3>
                 {userResults.length > 0 ? (
-                  userResults.map((user, index) => (
-                    <div key={user.id || `user-${index}`} className="result-item">
-                      <div className="result-content" onClick={() => openUserSearchView(user.id)}>
+                  userResults.map((user) => (
+                    <div key={user.id} className="result-item">
+                      <div 
+                        className="result-content" 
+                        onClick={() => handleUserClick(user.id)}
+                      >
                         <img
-                          src={user.profilePic || profilePic}
+                          src={user.profilePic ?? profilePic}
                           alt="User"
                           className="result-avatar"
                         />
@@ -193,7 +207,7 @@ const Search: React.FC = () => {
                       </div>
                       <div className="result-actions">
                         <button
-                          onClick={() => handleSupportClick(user.id, user.isSupported)}
+                          onClick={() => handleSupportButtonClick(user.id, user.isSupported)}
                           className={`support-button ${!user.isSupported ? 'support' : ''}`}
                         >
                           {user.isSupported ? 'Supported' : 'Support'}
@@ -216,7 +230,7 @@ const Search: React.FC = () => {
                     <div key={topic.id} className="result-item">
                       <div className="result-content">
                         <img
-                          src={topic.profilePic || profilePic}
+                          src={topic.profilePic ?? profilePic}
                           alt="Topic Author"
                           className="result-avatar"
                         />

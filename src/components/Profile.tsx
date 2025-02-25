@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useCallback } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../css/Profile.css";
 import "../css/TopicCard.css";
@@ -31,7 +30,6 @@ import ProfileSettingsModal from "./ProfileSettingsModalProps";
 const Profile: React.FC = () => {
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [showTopics, setShowTopics] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState("");
@@ -44,10 +42,8 @@ const Profile: React.FC = () => {
     useState<Topic | null>(null);
 
   // Upvote state management
-  const [upvotes, setUpvotes] = useState<{ [topicId: string]: number }>({});
-  const [userUpvotes, setUserUpvotes] = useState<{
-    [topicId: string]: boolean;
-  }>({});
+  const [upvotes, setUpvotes] = useState<Record<string, number>>({});
+  const [userUpvotes, setUserUpvotes] = useState<Record<string, boolean>>({});
 
   // Remove local location state – use global location from AuthContext instead.
   const { userId, location, logout } = useAuth();
@@ -57,22 +53,8 @@ const Profile: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-  useEffect(() => {
-    if (!userId) return;
-
-    fetchProfileData(userId)
-      .then(setProfileData)
-      .catch((error) => console.error("Error loading profile:", error));
-
-    fetchUserTopics(userId)
-      .then(async (fetchedTopics) => {
-        setTopics(fetchedTopics);
-        fetchUpvotes(fetchedTopics);
-      })
-      .catch((error) => console.error("Error loading topics:", error));
-  }, [userId]);
-
-  const fetchUpvotes = async (topics: Topic[]) => {
+  // Define fetchUpvotes outside useEffect to use as a dependency
+  const fetchUpvotes = useCallback(async (topics: Topic[]) => {
     if (!userId) return;
     try {
       const upvoteCounts = await Promise.all(
@@ -100,14 +82,29 @@ const Profile: React.FC = () => {
     } catch (error) {
       console.error("Error fetching upvotes:", error);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    void fetchProfileData(userId)
+      .then(setProfileData)
+      .catch((error) => console.error("Error loading profile:", error));
+
+    void fetchUserTopics(userId)
+      .then(async (fetchedTopics) => {
+        setTopics(fetchedTopics);
+        void fetchUpvotes(fetchedTopics);
+      })
+      .catch((error) => console.error("Error loading topics:", error));
+  }, [userId, fetchUpvotes]);
 
   const toggleUpvote = async (topicId: string) => {
     if (!userId) return;
-    const currentUpvoted = userUpvotes[topicId] || false;
+    const currentUpvoted = userUpvotes[topicId] ?? false;
     const newUpvotes = {
       ...upvotes,
-      [topicId]: (upvotes[topicId] || 0) + (currentUpvoted ? -1 : 1),
+      [topicId]: (upvotes[topicId] ?? 0) + (currentUpvoted ? -1 : 1),
     };
     const newUserUpvotes = { ...userUpvotes, [topicId]: !currentUpvoted };
 
@@ -125,6 +122,11 @@ const Profile: React.FC = () => {
       setUpvotes(upvotes);
       setUserUpvotes(userUpvotes);
     }
+  };
+
+  // Non-promise returning wrapper for toggleUpvote
+  const handleToggleUpvote = (topicId: string) => {
+    void toggleUpvote(topicId);
   };
 
   const handleDeleteTopic = async (topicText: string, topicId: string) => {
@@ -147,6 +149,11 @@ const Profile: React.FC = () => {
     }
   };
 
+  // Non-promise returning wrapper for handleDeleteTopic
+  const onDeleteTopic = (topicText: string, topicId: string) => {
+    void handleDeleteTopic(topicText, topicId);
+  };
+
   const handleDeleteAccount = async () => {
     if (!userId) {
       alert("User not authenticated!");
@@ -154,7 +161,7 @@ const Profile: React.FC = () => {
     }
     const confirmDelete = window.confirm(
       `Are you sure you want to delete this account with username "${
-        profileData?.username || "Unknown"
+        profileData?.username ?? "Unknown"
       }" and "${topics.length} topic${topics.length !== 1 ? "s" : ""}"?`
     );
     if (!confirmDelete) return;
@@ -166,6 +173,11 @@ const Profile: React.FC = () => {
     } catch (error) {
       alert("Error deleting account. Please try again.");
     }
+  };
+
+  // Non-promise returning wrapper for handleDeleteAccount
+  const onDeleteAccount = () => {
+    void handleDeleteAccount();
   };
 
   // Updated handleNewTopicSubmit accepts annotate, text, and topicImage from CreateTopicModal.
@@ -180,7 +192,7 @@ const Profile: React.FC = () => {
       text,
       // Use the global location from AuthContext
       location,
-      topicImage: topicImage || undefined,
+      topicImage: topicImage ?? undefined,
     };
     try {
       const createdTopic = await createNewTopic(
@@ -228,7 +240,6 @@ const Profile: React.FC = () => {
     setIsDragging(false);
   };
 
-  // Dummy implementations for settings actions
   const handleProfileSave = async (updatedData: {
     username: string;
     gmail: string;
@@ -237,9 +248,11 @@ const Profile: React.FC = () => {
     gender: string;
     profilePicture?: File | null;
     phoneNumber: string;
-  }) => {
+  }): Promise<void> => {
     console.log("Profile updated:", updatedData);
     // TODO: Call backend update API and update state accordingly.
+    // This needs to be async to match the expected type
+    // When you implement the actual API call, you'll add an await here
   };
 
   const handleLogout = async () => {
@@ -253,6 +266,19 @@ const Profile: React.FC = () => {
     }
   };
   
+  // Non-promise returning wrapper for handleLogout
+  const onLogout = () => {
+    void handleLogout();
+  };
+
+  const handleImageClick = (imageUrl: string) => {
+    if (!imageUrl) return;
+    const fullImageUrl = imageUrl.startsWith("http")
+      ? imageUrl
+      : `data:image/png;base64,${imageUrl}`;
+    setModalImageUrl(fullImageUrl);
+    setShowImageModal(true);
+  };
 
   if (!profileData) {
     return <div>Loading...</div>;
@@ -346,7 +372,7 @@ const Profile: React.FC = () => {
                     <button
                       className="flex items-center text-gray-300 hover:text-white transition-all duration-200"
                       onClick={() =>
-                        handleDeleteTopic(topic.text, topic.id.toString())
+                        onDeleteTopic(topic.text, topic.id.toString())
                       }
                     >
                       <i className="bi bi-trash text-xl"></i>
@@ -372,11 +398,7 @@ const Profile: React.FC = () => {
                       style={{ maxHeight: "300px" }}
                       onClick={() => {
                         if (!topic.topicImageUrl) return; // Guard clause for null value
-                        const imageUrl = topic.topicImageUrl.startsWith("http")
-                          ? topic.topicImageUrl
-                          : `data:image/png;base64,${topic.topicImageUrl}`;
-                        setModalImageUrl(imageUrl);
-                        setShowImageModal(true);
+                        handleImageClick(topic.topicImageUrl);
                       }}
                     />
                   </div>
@@ -398,11 +420,11 @@ const Profile: React.FC = () => {
                         ? "text-blue-500"
                         : "text-gray-300 hover:text-white"
                     }`}
-                    onClick={() => toggleUpvote(topic.id.toString())}
+                    onClick={() => handleToggleUpvote(topic.id.toString())}
                   >
                     <i className="bi bi-rocket text-xl"></i>
                     <span className="ml-4">
-                      {upvotes[topic.id.toString()] || 0}
+                      {upvotes[topic.id.toString()] ?? 0}
                     </span>
                   </button>
                 </div>
@@ -438,7 +460,7 @@ const Profile: React.FC = () => {
           text: string;
           photo: File | null;
         }) => {
-          handleNewTopicSubmit(
+          void handleNewTopicSubmit(
             topicData.annotate,
             topicData.text,
             topicData.photo
@@ -453,7 +475,7 @@ const Profile: React.FC = () => {
           onClose={() => setIsOpinionsModalOpen(false)}
           topicText={selectedTopicForOpinions.text}
           topicId={selectedTopicForOpinions.id.toString()}
-          topicImage={selectedTopicForOpinions.topicImageUrl || null}
+          topicImage={selectedTopicForOpinions.topicImageUrl ?? null}
           username={profileData.username}
           userProfilePic={profilePic}
           location={selectedTopicForOpinions.location}
@@ -475,8 +497,8 @@ const Profile: React.FC = () => {
           onClose={() => setShowSettingsModal(false)}
           profileData={profileData}
           onSave={handleProfileSave}
-          onLogout={handleLogout}
-          onDelete={handleDeleteAccount}
+          onLogout={onLogout}
+          onDelete={onDeleteAccount}
         />
       )}
     </div>

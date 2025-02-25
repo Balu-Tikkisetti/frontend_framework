@@ -25,7 +25,7 @@ class UserProfile {
     this.password = password;
     this.dob = dob;
     this.gender = gender;
-    this.profilePicture = profilePicture || null;
+    this.profilePicture = profilePicture ?? null;
     this.phoneNumber = phoneNumber;
     this.supporters = supporters;
     this.supported = supported;

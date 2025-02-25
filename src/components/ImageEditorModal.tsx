@@ -9,6 +9,24 @@ import 'rc-slider/assets/index.css';
 import '../css/Modals/ImageEditorModal.css';
 import getCroppedImg from '../utils/cropImage';
 
+// Define proper types for the cropper
+interface Point {
+  x: number;
+  y: number;
+}
+
+interface PixelCrop {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface ImageEditOptions {
+  shadow: boolean;
+  brightness: number;
+}
+
 interface ImageEditorModalProps {
   show: boolean;
   imageSrc: string;
@@ -18,28 +36,39 @@ interface ImageEditorModalProps {
 
 const ImageEditorModal: React.FC<ImageEditorModalProps> = ({ show, imageSrc, onClose, onSave }) => {
   // Crop state and zoom
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<PixelCrop | null>(null);
 
   // Effects state: shadow toggle and brightness level
   const [shadow, setShadow] = useState(false);
   const [brightness, setBrightness] = useState(100);
 
-  const onCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
-    setCroppedAreaPixels(croppedAreaPixels);
+  const onCropComplete = useCallback((_: unknown, croppedPixels: PixelCrop) => {
+    setCroppedAreaPixels(croppedPixels);
   }, []);
 
   // When user clicks "Save", process the crop and effects, and return a File
   const handleSave = async () => {
     try {
-      const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels, { shadow, brightness });
+      if (!croppedAreaPixels) return;
+      
+      const croppedBlob = await getCroppedImg(
+        imageSrc, 
+        croppedAreaPixels, 
+        { shadow, brightness } as ImageEditOptions
+      );
       const editedFile = new File([croppedBlob], "edited_image.png", { type: 'image/png' });
       onSave(editedFile);
     } catch (err) {
       console.error("Error editing image:", err);
       onSave(null);
     }
+  };
+
+  // Wrapper function for handleSave that doesn't return a Promise
+  const handleSaveClick = () => {
+    void handleSave();
   };
 
   // Reset local state when modal is reopened
@@ -104,7 +133,7 @@ const ImageEditorModal: React.FC<ImageEditorModalProps> = ({ show, imageSrc, onC
         <Button variant="secondary" onClick={onClose}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleSave}>
+        <Button variant="primary" onClick={handleSaveClick}>
           Save Changes
         </Button>
       </Modal.Footer>
