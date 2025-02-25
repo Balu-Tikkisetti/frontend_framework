@@ -31,7 +31,6 @@
     "simplex-noise": "^4.0.3",
     "sockjs-client": "^1.6.1",
     "three": "^0.170.0",
-    "three-orbitcontrols": "^2.110.3",
     "wouter": "^3.0.1"
   },
   "devDependencies": {
