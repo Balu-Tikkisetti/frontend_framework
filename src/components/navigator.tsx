@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useParams } from "react-router-dom";
 import { 
   Globe, 
   MapPin, 
@@ -18,7 +17,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   onButtonClick, 
   isHidden = false
 }) => {
-  const { username } = useParams();
+ 
   const [activeButton, setActiveButton] = useState<string | null>(null);
 
   const navButtons = [

@@ -8,13 +8,7 @@ interface UpvoteResponse {
   message: string;
 }
 
-interface UpvoteCountResponse {
-  count: number;
-}
 
-interface HasUpvotedResponse {
-  hasUpvoted: boolean;
-}
 
 // ✅ Add an upvote
 export const addUpvote = async (userId: number, topicId: string): Promise<UpvoteResponse> => {
