@@ -13,7 +13,7 @@ interface NavigationBarProps {
   isHidden?: boolean;
 }
 
-const NavigationBar: React.FC<NavigationBarProps> = ({ 
+const Navigator: React.FC<NavigationBarProps> = ({ 
   onButtonClick, 
   isHidden = false
 }) => {
@@ -116,4 +116,4 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   );
 };
 
-export default NavigationBar;
+export default Navigator;
