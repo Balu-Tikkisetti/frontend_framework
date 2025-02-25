@@ -45,7 +45,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({
   const [gender, setGender] = useState(profileData.gender);
   const [phoneNumber, setPhoneNumber] = useState(profileData.phoneNumber);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [profilePicturePreview, setProfilePicturePreview] = useState(profileData.profilePicture || "");
+  const [profilePicturePreview, setProfilePicturePreview] = useState(profileData.profilePicture ?? "");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -58,7 +58,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({
       setGender(profileData.gender);
       setPhoneNumber(profileData.phoneNumber);
       setProfilePicture(null);
-      setProfilePicturePreview(profileData.profilePicture || "");
+      setProfilePicturePreview(profileData.profilePicture ?? "");
       setError("");
     }
   }, [show, profileData]);

@@ -56,7 +56,7 @@ const Notifications: React.FC = () => {
 
     try {
       setLoading(true);
-      const newNotifications = await fetchNotifications(userId, pageNum) as Notification[];
+      const newNotifications = await fetchNotifications(userId, pageNum) as unknown as Notification[];
       
       setNotifications(prev => {
         if (pageNum === 0) return newNotifications;

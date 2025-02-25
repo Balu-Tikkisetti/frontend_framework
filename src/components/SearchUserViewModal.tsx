@@ -54,7 +54,7 @@ const SearchUserViewModal: React.FC<SearchUserViewModalProps> = ({ userProfile, 
       const initialUserUpvotes: Record<string, boolean> = {};
       userProfile.topics.forEach((topic) => {
         // Default to zero if upvotes is undefined
-        initialUpvotes[topic.id] = topic.upvotes || 0;
+        initialUpvotes[topic.id] = topic.upvotes ?? 0;
         initialUserUpvotes[topic.id] = false;
       });
       setUpvotes(initialUpvotes);
@@ -94,8 +94,7 @@ const SearchUserViewModal: React.FC<SearchUserViewModalProps> = ({ userProfile, 
      if (!currentUserId) {
       return alert("Unauthorized");
     }
-    console.log(currentUserId);
-    console.log(recipientId);
+
     try {
       await sendMessageRequest(currentUserId, recipientId);
       console.log(`Message request sent for user: ${recipientId}`);
@@ -132,7 +131,7 @@ const SearchUserViewModal: React.FC<SearchUserViewModalProps> = ({ userProfile, 
               <div className="user-details-section mb-4">
                 <div className="d-flex align-items-center">
                   <img
-                    src={userProfile.profilePic || profilePic}
+                    src={userProfile.profilePic ?? profilePic}
                     alt="User Profile"
                     className="rounded-circle me-3"
                     style={{ width: "60px", height: "60px" }}
@@ -204,9 +203,9 @@ const SearchUserViewModal: React.FC<SearchUserViewModalProps> = ({ userProfile, 
           onClose={closeOpinionsModal}
           topicText={selectedTopic.text}
           topicId={selectedTopic.id}
-          topicImage={selectedTopic.topicImage || null}
+          topicImage={selectedTopic.topicImage ?? null}
           username={userProfile.username}
-          userProfilePic={userProfile.profilePic || profilePic}
+          userProfilePic={userProfile.profilePic ?? profilePic}
           location={selectedTopic.location}
           timestamp={selectedTopic.timestamp}
         />
